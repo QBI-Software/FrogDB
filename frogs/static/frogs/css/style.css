@@ -1,0 +1,100 @@
+
+footer {
+  width: 500px;
+  margin: 50px auto;
+  overflow:hidden;
+  border-top: 1px dotted #ccc;
+  padding-top: 5px;
+  font-size: 13px;
+
+}
+footer p{
+    text-align:center;
+    font-size: 0.8em;
+}
+
+.navbar{
+    background-color:#666;
+    color:white;
+    text-shadow:none;
+}
+.navbar a.ui-link{ color:white !important; }
+.navbar a.ui-link:hover{ color:green !important; }
+.navbar-right{
+    vertical-align:bottom;
+    padding-top:10px;
+    padding-right:10px;
+    }
+
+.navbar-nav a {
+    color:#DFF0D8 !important;
+}
+.navbar-nav a:hover {
+    color:#5cb85c !important;
+}
+
+.dropdown-menu{
+    background-color: #5CB85C;
+    }
+
+/* Form layout */
+/*label, input, select {
+    min-width:200px;
+    min-height:25px;
+}
+*/
+.form-control input {
+}
+.list-group-item{
+    min-width:200px;
+    }
+.helptext{
+    display:none;
+}
+#id_current_location{
+ max-width:200px;
+ }
+.sidebar{
+    margin-left: 30px;
+}
+
+ul#id_frogs li, ul#id_expts li{
+    list-style-type:none;
+}
+ul#id_frogs label, ul#id_expts label{
+    width:auto;
+}
+ul#id_frogs input[type=checkbox], ul#id_expts input[type=checkbox]{
+    vertical-align:middle;
+    display:inherit;
+    height:auto;
+    width:auto;
+    float:left;
+    margin:5px;
+    min-width:20px;
+}
+ul.errorlist{
+    color: #a94442;
+    background-color: #f2dede;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ebccd1;
+    border-radius: 4px;
+}
+ul.errorlist li{
+    list-display-type:none !important;
+    }
+
+/**Report **/
+#report-logo{
+    margin: 0 40px 0 0;
+    float:left;
+}
+.report-header{
+    font-size: 0.9em;
+}
+.report-location{
+    text-align:center;
+    font-weight: bold;
+    font-size:1.1em;
+}
