@@ -1,0 +1,28 @@
+{% extends "frogs/base.html" %}{% block title %}Oocyte waste - bulk autoclave{% endblock %}{% block content %}
+<div class="container">
+    <div class="page-header"><h2>Autoclave details for Oocyte waste</h2></div>
+    <div class="row col-md-6">
+        <div class="well">
+            {% if form.fields.expts.choices|length > 0 %}
+            <form method="POST" class="post-form">
+                {% csrf_token %}
+
+                <fieldset data-role="controlgroup">
+                    <legend>Batch autoclave:</legend>
+
+                    {{ form.as_p }}
+                </fieldset>
+
+
+                <button type="submit" class="save btn btn-success">Save</button>
+                <a class="btn btn-default" href="{% url 'frogs:experiment_list_location' %}">Cancel</a>
+            </form>
+            {% else %}
+            <p>No samples ready for autoclave</p>
+            <a class="btn btn-default" href="{% url 'frogs:experiment_list_location' %}">Return</a>
+            {% endif %}
+
+
+        </div>
+    </div>
+</div>{% endblock %}

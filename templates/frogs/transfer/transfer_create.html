@@ -1,0 +1,18 @@
+{% extends "frogs/base.html" %}{% block content %}
+<div class="container">
+  {% if form.is_bound %}
+      <h2>Edit Transfer</h2>
+  {% else %}
+      <h2>New Transfer</h2>
+  {% endif %}
+  <div class="row col-md-6">
+        <div class="well">
+  <form id="transfer-edit" method="POST" role="form" class="post-form ui-responsive">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Save</button>
+    <button type="button" class="btn" onclick="javascript:history.back();return false;">Cancel</button>
+  </form>
+</div></div></div>
+
+{% endblock %}

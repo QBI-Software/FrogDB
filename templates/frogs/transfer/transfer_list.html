@@ -1,0 +1,39 @@
+{% extends "frogs/base.html" %}{% block title %}Transfers{% endblock %}
+{% load render_table from django_tables2 %}
+{% block sidebar %}
+
+<div class="sidebar">
+   <div class="well">
+    <button data-toggle="collapse" data-target="#searchform"><h4>Filter transfers</h4></button>
+       <div id="searchform" class="collapse">
+            <form method='GET'>
+                {{ filter.form.as_p }}
+                <br/>
+                <input type='submit' class="btn btn-info" value='Search'/>
+                <a href='{{ request.path }}' class="btn btn-default">Clear</a>
+
+                <div class="small">|&nbsp;
+                Displaying {{ filter.qs|length }} of {{ filter.queryset|length }} items.
+                &nbsp;|</div>
+
+            </form>
+       </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row col-md-12">
+    <div class="page-header"><h2>Transfers</h2></div>
+    {% if table %}
+        {% render_table table %}
+    {% else %}
+        <p>No transfers in database</p>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
+

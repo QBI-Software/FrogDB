@@ -1,0 +1,11 @@
+{% extends "frogs/base.html" %}
+{% block title %}Shipments{% endblock %}
+{% block content %}{% load render_table from django_tables2 %}
+<div class="container">
+    <div class="page-header"><h2>Frog Notes</h2></div>
+    <p><a href="{% url 'frogs:notes_create' %}" class="btn btn-info">Create New Note</a></p>
+    {% if notes_list %}
+    {% render_table notes_list %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "frogs/base.html" %}
+{% block title %}Frogs{% endblock %}
+{% block content %}{% load django_tables2 %}
+<div class="container">
+<div class="page-header"><h2>Frogs</h2></div>
+<p><a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
+</p>
+{% if frogs %}
+    <form action="{% url 'frogs:frog_bulkdisposal' %}" method="post" id="bulkdisposalform">
+        <input type="submit" class="btn btn-info" value="Dispose Frogs"/>
+        {% csrf_token %}
+    {% render_table frogs %}
+    </form>
+{% endif %}
+    </div>
+{% endblock %}

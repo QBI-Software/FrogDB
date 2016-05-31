@@ -1,0 +1,71 @@
+{% extends "frogs/base.html" %}{% block title %}Shipment - details{% endblock %}{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>View Shipment Details</h2></div>
+    <div class="col-md-6">
+        <div class="well">
+            <table id="view-table" class="ui-responsive table table-hover">
+                <tbody>
+                <tr>
+                    <th>AQIS Permit ID</th>
+                    <td>{{shipment.aqis|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>QEN</th>
+                    <td>{{shipment.qen|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Total Frogs imported</th>
+                    <td>{{shipment.get_totalfrogs|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Females</th>
+                    <td>{{shipment.females|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Males</th>
+                    <td>{{shipment.males|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Arrival Date</th>
+                    <td>{{shipment.arrival_date|date:"d-M-Y"}}</td>
+                </tr>
+                <tr>
+                    <th>Species</th>
+                    <td>{{shipment.species|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Supplier</th>
+                    <td>{{shipment.supplier|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Country</th>
+                    <td>{{shipment.country|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Colour</th>
+                    <td style="background-color:{{shipment.color}}">{{shipment.color}}</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="col-md-4">
+        <div class="container">
+            <h4>Choose an action</h4>
+            <div class="ui-responsive btn-group-vertical">
+                <a class="btn btn-default" href="{% url 'frogs:permit_update' shipment.id %}">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:permit_delete' shipment.id %}">Delete</a>
+                {% if shipment.frog_set.count <= 0 %}
+                <a class="btn btn-default" href="{% url 'frogs:bulkfrog_create' shipment.id %}">Generate Frog records</a>
+                {% else %}
+                <a class="btn btn-default" href="{% url 'frogs:bulkfrog_delete' shipment.id %}">Delete Frog records</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_list_byshipment' shipment.id %}">View Frogs<span class="badge">{{shipment.frog_set.count}}</span></a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endblock %}

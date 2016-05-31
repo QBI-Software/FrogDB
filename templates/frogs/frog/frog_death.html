@@ -1,0 +1,15 @@
+{% extends "frogs/base.html" %}{% block title %}Frog - Death{% endblock %}{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Death details for Frog ID {{frog.frogid|escape}}
+        </h2></div>
+    <div class="row col-md-6">
+        <div class="well">
+            <form method="POST" class="post-form" role="form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="save btn btn-default">Save</button>
+            </form>
+        </div>
+    </div>
+</div>{% endblock %}

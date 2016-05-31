@@ -1,0 +1,15 @@
+{% extends "frogs/base.html" %}
+{% block title %}Frog Delete{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header"><h2>Confirm delete </h2></div>
+  <div class="row col-md-6">
+    <div class="well">
+
+    <form action="" method="post">{% csrf_token %}
+        <p>Are you sure you want to delete Frog ID "{{ object }}"?</p>
+        <input type="submit" value="Confirm" />
+        <button type="button" class="btn" onclick="javascript:history.back();return false;">Cancel</button>
+    </form>
+    </div></div></div>
+{% endblock %}

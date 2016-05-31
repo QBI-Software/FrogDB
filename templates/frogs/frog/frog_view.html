@@ -1,0 +1,177 @@
+{% extends "frogs/base.html" %}{% block title %}Frog Details{% endblock %}{% block content %}
+
+<div class="container">
+    <div class="page-header">
+        <h2>View Frog Details
+        </h2></div>
+    <div class="row col-md-8">
+        <div class="col-md-6">
+            <h3>Frog {{frog.frogid|force_escape}}</h3>
+            <div class="well">
+                <table id="view-table" class="ui-responsive table table-hover">
+                    <tbody>
+                    <tr>
+                        <th>Frog ID</th>
+                        <td>{{frog.frogid|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>Tank #</th>
+                        <td>{{frog.tankid|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>Gender</th>
+                        <td>{{frog.get_gender_display|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>Species</th>
+                        <td>{{frog.species|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>Oocyte Condition</th>
+                        <td>{{frog.condition|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>General Remarks</th>
+                        <td>{{frog.remarks|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>QEN</th>
+                        <td>{{frog.qen|force_escape}}</td>
+                    </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td class="errorlist">{{frog.current_location|force_escape}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-5">
+
+            <h3>Dorsal</h3>
+            <div class="well thumb">
+                <a href='{{ MEDIA_URL }}{{frog.dorsalimage.imgfile.url }}', class="fancybox" rel="gallery1",  title="{{frog.dorsalimage.description}}">
+                    <img class="img-responsive" src="{{ MEDIA_URL }}{{frog.dorsalimage.imgfile.url }}" width="200px"  alt="{{frog.dorsalimage.description}}"/>
+                </a>
+
+            </div>
+            <h3>Ventral</h3>
+            <div class="well thumb">
+                <a href='{{ MEDIA_URL }}{{frog.ventralimage.imgfile.url }}', class="fancybox" rel="gallery1", title="{{frog.ventralimage.description}}">
+                    <img class="img-responsive" src="{{ MEDIA_URL }}{{frog.ventralimage.imgfile.url }}" width="200px" alt="{{frog.ventralimage.description}}"/>
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="container">
+            <h4>Choose an action</h4>
+            <div class="ui-responsive btn-group-vertical">
+                <a class="btn btn-default" href="{% url 'frogs:frog_update' frog.id %}">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_upload' frog.id %}">Images</a>
+                {% if frog.gender == 'female' and frog.operation_set.count < site_config.max_ops %}
+                <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}">Operation</a>
+                {% endif %}
+                <a class="btn btn-default" href="{% url 'frogs:frog_death' frog.id %}">Death</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_disposal' frog.id %}">Disposal</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row col-md-8">
+        {% if frog.gender == 'female' %}
+        <div data-role="collapsible" class="well">
+            <h3>Operations <span class="badge">{{frog.operation_set.count}}</span></h3>
+            <table id="ops-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Date</th>
+                    <th>Anaesthetic</th>
+                    <th>Volume</th>
+                    <th>Comments</th>
+                    <th>Initials</th>
+                    <th>Transfers</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>{% for operation in frog.get_operations %}
+                <tr>
+                    <td>{{operation.opnum}}</td>
+                    <td>{{operation.opdate|date:"d-M-Y"}}</td>
+                    <td>{{operation.anesthetic|force_escape}}</td>
+                    <td>{{operation.volume|force_escape}}</td>
+                    <td>{{operation.comments|force_escape}}</td>
+                    <td>{{operation.initials|force_escape}}</td>
+                    <td>
+                        <ul class="nav nav-pills">
+                            <li><a href="{% url 'frogs:transfer_list_byop' operation.id %}" title="View Transfers">
+                                <span class="badge">{{operation.transfer_set.count}}</span></a>
+                                <a href="{% url 'frogs:transfer_create' operation.id %}" title="New Transfer">
+                                    <i class="glyphicon glyphicon-plus-sign"></i></a></li></ul>
+                    </td>
+                    <td>
+                        <ul class="nav nav-pills nav-stacked">
+                        <li><a href="{% url 'frogs:operation_update' operation.id %}" title="Edit Operation"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a href="{% url 'frogs:operation_delete' operation.id %}" title="Delete Operation"><i class="glyphicon glyphicon-remove"></i></a></li>
+                        </ul>
+                    </td>
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        <div data-role="collapsible" class="well">
+            <h3>Death Details</h3>
+            <table id="death-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                <tr>
+                    <th>Death</th>
+                    <th>Date</th>
+                    <th>Initials</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{frog.death|force_escape}}</td>
+                    <td>{{frog.death_date|date:"d-M-Y"}}</td>
+                    <td>{{frog.death_initials|force_escape}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div data-role="collapsible" class="well">
+            <h3>Disposal Details</h3>
+            <table id="disposal-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                <tr>
+                    <th>Disposal action</th>
+                    <th>Date</th>
+                    <th>Run Number</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Autoclaved</td>
+                    <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
+                    <td>{{frog.autoclave_run|force_escape}}</td>
+                </tr>
+                <tr>
+                    <td>Incinerated</td>
+                    <td>{{frog.incineration_date|date:"d-M-Y"}}</td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+
+{% endblock %}

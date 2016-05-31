@@ -1,0 +1,37 @@
+{% extends "frogs/base.html" %}{% block title %}Shipment - details{% endblock %}{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>View Notes Details</h2></div>
+    <div class="col-md-6">
+        <div class="well">
+            <table id="view-table" class="ui-responsive table table-hover">
+                <tbody>
+                <tr>
+                    <th>Date</th>
+                    <td>{{notes.note_date|date:"d-M-Y"}}</td>
+                </tr>
+                <tr>
+                    <th>Notes</th>
+                    <td>{{notes.notes|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Initials</th>
+                    <td>{{notes.initials|force_escape}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="col-md-4">
+        <div class="container">
+            <h4>Choose an action</h4>
+            <div class="ui-responsive btn-group-vertical">
+                <a class="btn btn-default" href="{% url 'frogs:notes_update' notes.id %}">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:notes_delete' notes.id %}">Delete</a>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}

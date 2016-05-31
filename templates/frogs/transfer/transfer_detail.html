@@ -1,0 +1,51 @@
+{% extends "frogs/base.html" %}{% block content %}
+<div class="container">
+    <div class="page-header"><h2>View Transfer Details</h2>
+    </div>
+    <div class="col-md-6">
+        <div class="well">
+            <table id="view-table" class="ui-responsive table table-hover">
+                <tbody>
+                <tr>
+                    <th>Frog ID</th>
+                    <td>{{transfer.operationid.frogid|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Species</th>
+                    <td>{{transfer.operationid.frogid.species|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Oocytes volume carried (ml)</th>
+                    <td>{{transfer.volume|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Transporter</th>
+                    <td>{{transfer.transporter|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Transfer Date</th>
+                    <td>{{transfer.transfer_date|date:"d-M-Y"}}</td>
+                </tr>
+                <tr>
+                    <th>Transported From/To</th>
+                    <td>{{transfer.transferapproval|force_escape}}</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <div class="col-md-4 rightpanel">
+        <div class="container">
+            <h4>Choose an action</h4>
+            <div class="ui-responsive btn-group-vertical">
+                <a class="btn btn-default" href="{% url 'frogs:transfer_update' transfer.id %}">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:transfer_delete' transfer.id %}">Delete</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_detail' transfer.operationid.frogid.id %}">View Frog</a>
+                <a class="btn btn-default" href="{% url 'frogs:experiment_create' transfer.id %}">Add Experiment</a>
+                 <a class="btn btn-default" href="{% url 'frogs:experiment_list_bytransfer' transfer.id %}">View Experiments <span class="badge">{{transfer.experiment_set.count}}</span></a>
+            </div>
+        </div>
+    </div>
+</div>{% endblock %}

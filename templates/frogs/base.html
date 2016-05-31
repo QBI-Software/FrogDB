@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+{% load i18n %}{% load render_table from django_tables2 %}
+{% load solo_tags %}
+{% get_solo 'frogs.SiteConfiguration' as site_config %}
+
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{{ site_config.site_name }} - {% block title %}{% endblock %}</title>
+    {% load staticfiles %}
+    <link rel="icon" href="{% static "frogs/img/favicon.ico" %}" type="image/png"/>
+    <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}"/>
+    <link rel="stylesheet" href="{% static "frogs/css/style.css" %}"/>
+    <!-- Add fancyBox -->
+    <link rel="stylesheet" href="{% static "fancybox/source/jquery.fancybox.css" %}" type="text/css" media="screen" />
+
+    <script type="text/javascript" src="{% static "frogs/js/jquery-1.12.3.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "fancybox/source/jquery.fancybox.pack.js" %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $(".fancybox").fancybox({
+              helpers:{
+                title:{
+                  type: 'outside'
+                },
+                overlay:{
+                  speedOut: 0
+                }
+              },
+
+              openEffect	: 'none',
+              closeEffect	: 'none'
+          });
+      });
+    </script>
+
+  </head>
+  <body>
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+		<div class="navbar-header">
+		  <a  class="navbar-brand" href="/frogs/">
+		  <img src="{% static 'frogs/img/kermit.png' %}" alt="QBI FrogDB"/></a>
+		</div>
+		{% if user.is_authenticated %}
+		    <ul class="nav navbar-nav">
+		    {% include "frogs/navlinks.html" %}
+		  </ul>
+		  <div class="navbar-right">
+            <p>Welcome, {{ user.username }}
+            <a id="logoutbtn" class="btn btn-success" href="{% url 'frogs:logout' %}">Logout</a></p>
+          </div>
+        {% else %}
+          {% if form.non_field_errors %}
+            <p class="col-sm-4 alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+          </p>
+
+            {% endif %}
+
+		  <form class="navbar-form navbar-right" role="form" method="post" action="{% url 'frogs:loginform' %}">
+              {% csrf_token %}
+              <span><i class="glyphicon glyphicon-user"></i></span><div class="form-group">
+              <input type="text" class="form-control" name="username" placeholder="Username">
+              </div>
+              <span><i class="glyphicon glyphicon-lock"></i></span>
+              <div class="form-group"><input type="password" class="form-control" name="password" placeholder="Password">
+              </div>
+              <button type="submit" class="btn btn-primary">Sign In</button>
+          </form>
+        {% endif %}
+	  </div>
+	</nav>
+	 <div class="container content">
+	{% block sidebar %}{% endblock %}
+	{% block content %}{% endblock %}
+	</div>
+	<footer>
+        {% block footer_navigation %}
+            {% include "frogs/footer_navbar.html" %}
+        {% endblock %}
+            <p>Copyright (c) 2016 Queensland Brain Institute</p>
+        </footer>
+    </body>
+</html>

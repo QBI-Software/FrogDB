@@ -1,0 +1,3 @@
+{% for sp in species %}
+    <li><a href="{% url 'frogs:froglog_report' sp.name %}">{{ sp.name }}</a></li>
+{% endfor %}

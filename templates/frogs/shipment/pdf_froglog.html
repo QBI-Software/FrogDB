@@ -1,0 +1,89 @@
+{% extends "frogs/base.html" %}
+{% block extra_style %}
+<style type="text/css">
+@font-face { font-family: Lato; src: url(fonts/Lato-Reg.ttf); }
+body {
+font-family: "Lato", "Helvetica", "sans-serif";
+color: #333333;
+}
+</style>
+{% endblock %}
+
+{% block title %}Frog Log{% endblock %}
+{% block content %}{% load render_table from django_tables2 %}
+<div class="container">
+
+    <div class="page-header">
+        <p class="report-header">Quarantine Sample Register<br/>Declared pest species - Log<br/>University of Queensland</p>
+        <h2 class="report-title">{{ species }}</h2></div>
+    <div class="report-location">{{ site_config.report_location }}</div>
+    <div class="report-contact">{{ site_config.report_contact_details|safe }}</div>
+    <div class="well">
+        {% if table %}
+            {% render_table table %}
+        {% endif %}
+    </div>
+    <div class="report-general">{{ site_config.report_general_notes|safe }}</div>
+    {% if frognotes_table %}
+    <div class="frog-notes well">
+        <h3>Frog Notes</h3>
+        {% render_table frognotes_table %}
+    </div>
+    {% endif %}
+
+    {% for loc in locations %}
+        <h2 class="report-tableheader">{{ loc.name }}</h2>
+        {% for gender in genders %}
+            <div class="well"><h3>{{ gender|capfirst }}</h3>
+                <table class="table table-striped"><thead><tr>
+                    <th>Frog ID</th>
+                    <th>QEN</th>
+                    <th>AEC</th>
+                    <th>Disposal</th>
+                    <th>Operation Details</th>
+                </tr></thead>
+
+
+            {% for frog in frogs_table %}
+                {% if frog.gender == gender and frog.current_location == loc %}
+                <tbody><tr style="background-color: {{frog.qen.color }}">
+                    <td>{{frog.frogid}}</td>
+                    <td>{{frog.qen}}</td>
+                    <td>{{frog.aec}}</td>
+                    <td>{{frog.disposed}}</td>
+                    <td>{% for op in frog.operation_set.all %}
+                        <table class="table"><thead><tr>
+                            <th>No</th>
+                            <th>Initials</th>
+                            <th>Date</th>
+                            <th>Experiments</th>
+                            <th>Disposal dates</th>
+                            <th>Autoclaved</th>
+                        </tr></thead>
+                        <tbody><tr>
+                            <td>{{ op.opnum }}</td>
+                            <td>{{ op.initials }}</td>
+                            <td>{{ op.opdate }}</td>
+                            <td>{{ op.get_number_expts }}</td>
+                            <td>{{ op.get_expts_disposaldate_range }}</td>
+                            <td>{{ op.get_expts_number_disposals }}</td>
+                        </tr></tbody></table>
+                        {% empty %}
+                        <p>No operations performed</p>
+                        {% endfor %}
+                    </td>
+                </tr></tbody>
+                {% endif %}
+            {% endfor %}
+                 </table>
+            </div>
+        {% empty %}
+             <p>No data available</p>
+        {% endfor %}
+
+    {% empty %}
+         <p>No data available</p>
+    {% endfor %}
+
+    </div>
+{% endblock %}

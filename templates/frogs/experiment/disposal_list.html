@@ -1,0 +1,36 @@
+{% extends "frogs/base.html" %}
+{% block title %}Experiments{% endblock %}
+{% block content %}{% load render_table from django_tables2 %}
+<div class="container">
+<div class="page-header"><h2>Autoclave Disposal Register</h2></div>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="{% url 'frogs:disposal_list' %}#all">All</a></li>
+
+     {% for t, expt_list in tablelist.items %}
+        {% if t != 'All' %}
+            <li><a data-toggle="tab" href="{% url 'frogs:disposal_list' %}#{{t.lower}}">{{t}}</a></li>
+        {% endif %}
+        
+    {% endfor %}
+    </ul>
+    <div class="tab-content">
+
+        {% for t, expt_list in tablelist.items %}
+            {% if t != 'All' %}
+            <div id="{{ t.lower }}" class="tab-pane fade in">
+            {% else %}
+            <div id="{{ t.lower }}" class="tab-pane fade in active">
+            {% endif %}
+            {% if expt_list %}
+                <div class="well-sm" align="right">
+                    <a href="{% url 'frogs:expt_bulkautoclave' t.lower %}" class="btn btn-success">Bulk Autoclave</a>
+                </div>
+                {% render_table expt_list %}
+            {% else %}
+                <div class="alert alert-success"><p>No experiments in database</p></div>
+            {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+ </div>
+{% endblock %}

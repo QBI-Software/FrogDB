@@ -1,0 +1,15 @@
+{% extends "frogs/base.html" %}
+{% block title %}Experiments{% endblock %}
+{% block content %}{% load render_table from django_tables2 %}
+<div class="container">
+    <div class="page-header"><h2>Experiments for Transfer</h2></div>
+    <div class="alert alert-info">
+        <dl><dt>Frog ID: {{ frogid|force_escape }}</dt>
+        <dd>Transfer From/To: {{ transfer_from_to|force_escape }}</dd>
+        <dd>Transfer Date: {{ transfer_date|date:"d M Y" }}</dd>
+    </dl></div>
+   {% render_table expt_list %}
+
+
+</div>
+{% endblock %}

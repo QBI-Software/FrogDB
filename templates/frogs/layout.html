@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title|escape}} - FrogDB</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "frogs/css/style.css" %}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="{% static "frogs/css/jquery.mobile-1.4.5.min.css" %}"/>
+    <script type="text/javascript" src="{% static "frogs/js/jquery-1.7.1.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "frogs/js/jquery.mobile-1.4.5.min.js" %}"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Welcome to QBI's FrogDB</h1>
+        <img src="{% static 'frogs/img/kermit.png' %}" alt="My image"/>
+    </header>
+    <div class="container">
+      <div class="main-content">{% block content %}{% endblock %}
+      </div>
+      <div class="sidebar">{% block sidebar %}{% endblock %}
+      </div>
+    </div>
+    <footer>
+      <p>Copyright (c) 2016 Queensland Brain Institute</p>
+    </footer>
+  </body>
+</html>

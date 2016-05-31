@@ -1,0 +1,28 @@
+{% extends "frogs/base.html" %}{% block title %}Frog - bulk disposal{% endblock %}{% block content %}
+<div class="container">
+    <div class="page-header"><h2>Disposal details for Frogs</h2></div>
+    <div class="row col-md-6">
+        <div class="well">
+        {% if form.fields.frogs.choices|length > 0 %}
+            <form method="POST" class="post-form">
+                {% csrf_token %}
+
+                <fieldset data-role="controlgroup">
+                    <legend>Select Frogs for disposal:</legend>
+
+                    {{ form.as_p }}
+                </fieldset>
+
+
+                <button type="submit" class="save btn btn-success">Save</button>
+                <a class="btn btn-default" href="{% url 'frogs:frog_list_filter' %}">Cancel</a>
+            </form>
+        {% else %}
+            <p>No frogs ready for disposal</p>
+            <a class="btn btn-default" href="{% url 'frogs:frog_list_filter' %}">Cancel</a>
+        {% endif %}
+
+
+        </div>
+    </div>
+</div>{% endblock %}

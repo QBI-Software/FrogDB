@@ -1,0 +1,37 @@
+{% extends "frogs/base.html" %}{% block title %}Operations{% endblock %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header"><h2>State of Operations as at {% now "d-M-Y" %}</h2></div>
+     <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="{% url 'frogs:operation_summary' %}#all">All</a></li>
+
+    {% for sp, sptable in summaries_sp.items %}
+        <li><a data-toggle="tab" href="{% url 'frogs:operation_summary' %}#{{sp}}">X.{{sp}}</a></li>
+    {% endfor %}
+       
+    </ul>
+    <div class="tab-content">
+    <div id="all" class="tab-pane fade in active">
+        {% if summaries %}
+            {% render_table summaries %}
+        {% else %}
+            <div class="alert alert-success"><p>No operations in database</p></div>
+        {% endif %}
+    </div>
+    
+    {% for sp, sptable in summaries_sp.items %}
+        <div id="{{sp}}" class="tab-pane fade">
+        {% if sptable %}
+            {% render_table sptable %}
+        {% else %}
+            <div class="alert alert-success"><p>No X.{{sp}} operations in database</p></div>
+        {% endif %}
+    </div>
+
+    {% endfor %}
+
+
+        </div>
+</div>{% endblock %}

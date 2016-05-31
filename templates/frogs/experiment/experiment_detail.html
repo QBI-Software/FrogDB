@@ -1,0 +1,116 @@
+{% extends "frogs/base.html" %}{% block content %}
+<div class="container">
+    <div class="page-header"><h2>View Experiment Details</h2>
+    </div>
+    <div class="col-md-6">
+        <div class="well">
+            <table id="view-table" class="ui-responsive table table-hover">
+                <tbody>
+                <tr>
+                    <th>Frog ID</th>
+                    <td>{{expt.transferid.operationid.frogid|force_escape}}</td>
+                </tr>
+                <tr>
+                    <th>Species</th>
+                    <td>{{expt.transferid.operationid.frogid.species|force_escape}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div data-role="collapsible" class="well">
+            <h2>Experiments</h2>
+            <table id="expt-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                    <tr>
+                        <th>Experiment From</th>
+                        <th>Experiment To</th>
+                        <th>Experiment Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{expt.expt_from|date:"d-M-Y"}}</td>
+                        <td>{{expt.expt_to|date:"d-M-Y"}}</td>
+                        <td>{{expt.expt_location}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div data-role="collapsible" class="well">
+            <h2>Oocytes transfer</h2>
+            <table id="ooctye-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                    <tr>
+                        <th>Volume received (ml)</th>
+                        <th>Volume transferred (ml)</th>
+                        <th>Volume used (ml)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{expt.received|force_escape}}</td>
+                        <td>{{expt.transferred|force_escape}}</td>
+                        <td>{{expt.used|force_escape}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div data-role="collapsible" class="well">
+            <h2>Disposal</h2>
+            <table id="disposal-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                    <tr>
+                        <th>Disposed of</th>
+                        <th>Disposal sent by</th>
+                        <th>Disposal date</th>
+                        <th>Waste type</th>
+                        <th>Waste content</th>
+                        <th>Waste quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{expt.expt_disposed}}</td>
+                        <td>{{expt.disposal_sentby}}</td>
+                        <td>{{expt.disposal_date|date:"d-M-Y"}}</td>
+                        <td>{{expt.waste_type}}</td>
+                        <td>{{expt.waste_content}}</td>
+                        <td>{{expt.waste_qty}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div data-role="collapsible" class="well">
+            <h2>Autoclave</h2>
+            <table id="autoclave-table" data-role="table" class="ui-responsive table table-hover">
+                <thead>
+                    <tr>
+                        <th>Autoclave indicator</th>
+                        <th>Autoclave complete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{expt.autoclave_indicator}}</td>
+                        <td>{{expt.autoclave_complete}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-4 rightpanel">
+        <div class="container">
+            <h4>Choose an action</h4>
+            <div class="ui-responsive btn-group-vertical">
+                <a class="btn btn-default" href="{% url 'frogs:experiment_update' expt.id %}">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:experiment_delete' expt.id %}">Delete</a>
+                <a class="btn btn-default" href="{% url 'frogs:experiment_disposal' expt.id %}">Disposal</a>
+                <a class="btn btn-default" href="{% url 'frogs:experiment_autoclave' expt.id %}">Autoclave</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_detail' expt.transferid.operationid.frogid.id %}">View Frog</a>
+             </div>
+        </div>
+    </div>
+</div>{% endblock %}

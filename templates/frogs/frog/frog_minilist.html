@@ -1,0 +1,17 @@
+{% extends "frogs/base.html" %}
+{% block title %}Frogs{% endblock %}
+{% load django_tables2 %}
+
+{% block content %}
+<div class="container">
+    <div class="row col-md-12">
+    <div class="page-header"><h2>{{ list_title }}</h2></div>
+    <p><a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
+        {% if table %}
+        <a href="{% url 'frogs:bulkfrog_disposal' %}" class="btn btn-success">Dispose Frogs</a></p>
+        {% render_table table %}
+        {% else %}
+        </p>
+        {% endif %}
+</div></div>
+{% endblock %}
