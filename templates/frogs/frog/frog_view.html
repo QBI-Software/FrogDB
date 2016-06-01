@@ -27,8 +27,8 @@
                         <td>{{frog.species|force_escape}}</td>
                     </tr>
                     <tr>
-                        <th>Oocyte Condition</th>
-                        <td>{{frog.condition|force_escape}}</td>
+                        <th>Condition</th>
+                        <td>{{frog.condition|yesno:"Poor,OK"}}</td>
                     </tr>
                     <tr>
                         <th>General Remarks</th>
@@ -133,14 +133,14 @@
                 <tr>
                     <th>Death</th>
                     <th>Date</th>
-                    <th>Initials</th>
+                    <th>Recorded by</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td>{{frog.death|force_escape}}</td>
                     <td>{{frog.death_date|date:"d-M-Y"}}</td>
-                    <td>{{frog.death_initials|force_escape}}</td>
+                    <td>{{frog.initials|force_escape}}</td>
                 </tr>
                 </tbody>
             </table>

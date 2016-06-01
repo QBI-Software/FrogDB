@@ -8,6 +8,21 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 #from .models import SiteConfiguration
 from solo.models import SingletonModel
+
+#######################################################################
+## Utils
+#######################################################################
+def get_initials_from_user(uname):
+    if uname is None:
+        return ""
+    if (uname.first_name and uname.last_name):
+        initials = "%s%s" % (uname.first_name[0], uname.last_name[0])
+    else:
+        initials = uname.username[0:1]
+    print("DEBUG: User=", uname)
+    print("DEBUG: Initials=", initials)
+    return initials.upper()
+
 #######################################################################
 ##  SITE CONFIG - Managed in Admin
 #######################################################################
@@ -133,13 +148,14 @@ class Frog(models.Model):
     gender = models.CharField(_("Gender"), max_length=10, choices=GENDERS)
     current_location = models.ForeignKey(Location, verbose_name="Current Location", null=False)
     species = models.ForeignKey(Species, verbose_name="Species", null=False)
-    condition = models.CharField(_("Oocyte Health Condition"), max_length=100, null=True, blank=True)
+    condition = models.BooleanField(_("Not Healthy"), default=False)
     remarks = models.TextField(_("General Remarks"),null=True, blank=True)
     qen = models.ForeignKey(Permit, verbose_name="QEN", on_delete=models.CASCADE, null=False)
     aec = models.CharField(_("AEC"), max_length=80,null=True, blank=True)
     death = models.ForeignKey(Deathtype, verbose_name="Death",null=True, blank=True)
     death_date = models.DateField("Date of Death", null=True, blank=True)
-    death_initials = models.CharField(_("Initials"), max_length=10, null=True, blank=True)
+    #death_initials = models.CharField(_("Initials"), max_length=10, null=True, blank=True)
+    death_recorded_by = models.ForeignKey(User, verbose_name="Death recorded by", related_name="death_recorded_by", null=True, blank=True)
     disposed = models.BooleanField(_("Disposed"), default=False)
     autoclave_date = models.DateField("Autoclave Date", null=True, blank=True)
     autoclave_run = models.PositiveIntegerField(_("Autoclave Run"), default=0, null=True, blank=True)
@@ -177,15 +193,26 @@ class Frog(models.Model):
     def next_operation(self):
         config = SiteConfiguration.objects.get()
         operation_interval = config.op_interval
+        max = config.max_ops
         if operation_interval is None:
             operation_interval = 180 #hardcoded default in days
         lastop = self.last_operation()
         d = timedelta(days=operation_interval)
-        if lastop is not None:
+        if lastop is not None: # and lastop.opnum <= max:
             nextop = lastop + d
             return nextop
         else:
             return None
+
+    def next_operation_OK(self):
+        nextop = self.next_operation()
+        rtn = True
+        if nextop:
+            delta = date.today() - nextop
+            if delta.days < 0:
+                rtn = False
+        return rtn
+
 
     def dorsalimage(self):
         return self.get_image('Dorsal')
@@ -201,6 +228,9 @@ class Frog(models.Model):
             if imgs.count() > 0:
                 img = imgs[0]
         return img
+
+    def initials(self):
+        return get_initials_from_user(self.death_recorded_by)
 
     #Validation
     def clean(self):
@@ -250,31 +280,36 @@ class Operation(models.Model):
     anesthetic = models.CharField(_("Anesthetic"), max_length=30)
     volume = models.PositiveSmallIntegerField("Volume (ml)")
     comments = models.TextField("Comments")
-    initials = models.CharField(_("Operated by"), max_length=10)
+    #initials = models.CharField(_("Operated by"), max_length=10)
+    operated_by = models.ForeignKey(User, verbose_name="Operated by", related_name="operated_by")
 
     def __str__(self):
         opref = "Frog %s Operation %d" % (self.frogid, self.opnum)
         return opref
 
-    def clean_opnum(self):
+    def clean(self):
+        #clean opnum
         config = SiteConfiguration.objects.get()
         max = config.max_ops
         if self.opnum > max:
             raise ValidationError("Can only create %d operations per frog" % max)
         nums = []
-        for n in self.frogid.operation_set:
-            nums.append(n.opnum)
-        if self.opnum in nums:
-            raise ValidationError("An operation %d already exists for this frog" % self.opnum)
+        if (self.frogid.operation_set.count() > 0):
+            for n in self.frogid.operation_set.all():
+                nums.append(n.opnum)
+            if self.opnum in nums:
+                raise ValidationError("An operation %d already exists for this frog" % self.opnum)
 
-    def clean_opdate(self):
-        config = SiteConfiguration.objects.get()
+        #clean opdate
         operation_interval = config.op_interval
         if (self.opdate < self.frogid.qen.arrival_date):
             raise ValidationError("This operation is earlier than the shipment arrival date")
-        delta = self.opdate - self.frogid.last_operation()
-        if delta < (operation_interval):
-            raise ValidationError("This operation is only %d days since the last operation (require an interval of %d days)" % delta, SiteConfiguration.op_interval)
+        if (self.frogid.last_operation() is not None):
+            delta = self.opdate - self.frogid.last_operation()
+            if delta.days < operation_interval:
+                err = "This operation is only %d days since the last operation (an interval of %d days is required )" % (delta.days, operation_interval)
+                print("DEBUG:", err)
+                raise ValidationError(err)
 
     def get_number_expts(self):
         total = 0
@@ -322,6 +357,10 @@ class Operation(models.Model):
                     if e.autoclave_complete:
                         total += 1
         return total
+
+    def initials(self):
+        return get_initials_from_user(self.operated_by)
+
 
 class TransferApproval(models.Model):
     tfr_from = models.ForeignKey(Qap, verbose_name="Transfer from", related_name="tfr_from")
@@ -374,7 +413,8 @@ class Experiment(models.Model):
     expt_to = models.DateField("Experiments to")
     expt_location = models.ForeignKey(Qap, verbose_name="Experiment Location", related_name="expt_location")
     expt_disposed = models.BooleanField(_("Disposed"), default=False)
-    disposal_sentby = models.ForeignKey(User, verbose_name="Disposal sent by",blank=True,null=True)
+    #disposal_sentby = models.ForeignKey(User, verbose_name="Disposal sent by",blank=True,null=True)
+    disposal_sentby = models.ForeignKey(User, verbose_name="Disposal sent by", related_name="disposal_sentby", blank=True, null=True)
     disposal_date = models.DateField("Disposal date", blank=True,null=True)
     waste_type = models.ForeignKey(Wastetype, verbose_name="Type of waste", blank=True,null=True)
     waste_content = models.CharField(_("Waste content"), max_length=30, blank=True,null=True)
@@ -387,10 +427,14 @@ class Experiment(models.Model):
         self.transferid.operationid.frogid, self.transferid.operationid.opnum, self.expt_to, self.used, self.received)
         return verbose
 
+    def initials(self):
+        return get_initials_from_user(self.disposal_sentby)
+
 class Notes(models.Model):
     note_date = models.DateField("Notes date")
     notes = models.CharField(_("Notes"), max_length=500, blank=True, null=True)
-    initials = models.CharField(_("Initials"), max_length=10, blank=True, null=True)
+    #initials = models.CharField(_("Initials"), max_length=10, blank=True, null=True)
+    notes_by = models.ForeignKey(User, verbose_name="Recorded by", related_name="notes_by")
 
     def __str__(self):
         return self.notes

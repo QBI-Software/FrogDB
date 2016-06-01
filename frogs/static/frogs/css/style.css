@@ -98,3 +98,20 @@ ul.errorlist li{
     font-weight: bold;
     font-size:1.1em;
 }
+
+/** Pagination **/
+.pagination{
+    display:block;
+}
+.current{
+    float:left;
+    margin:5px 20px;
+    font-weight:bold;
+}
+.next{
+    margin:0 20px;
+}
+.cardinality{
+    float:right;
+    font-size: 0.8em;
+}

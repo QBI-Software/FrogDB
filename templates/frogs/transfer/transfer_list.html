@@ -7,7 +7,7 @@
     <button data-toggle="collapse" data-target="#searchform"><h4>Filter transfers</h4></button>
        <div id="searchform" class="collapse">
             <form method='GET'>
-                {{ filter.form.as_p }}
+                {{ filter.form.as_table }}
                 <br/>
                 <input type='submit' class="btn btn-info" value='Search'/>
                 <a href='{{ request.path }}' class="btn btn-default">Clear</a>

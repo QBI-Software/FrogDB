@@ -125,7 +125,7 @@ class FrogDeathForm(ModelForm):
         fields = ('frogid',
                   'death',
                   'death_date',
-                  'death_initials',
+                  'death_recorded_by',
                   'current_location'
                   )
         widgets = {
@@ -242,7 +242,7 @@ class OperationForm(ModelForm):
                   'anesthetic',
                   'volume',
                   'comments',
-                  'initials')
+                  'operated_by')
         widgets = {
             'opdate': DateInput(format=('%Y-%m-%d'),
                                 attrs={'class': 'myDateClass',
@@ -431,7 +431,7 @@ class NotesForm(ModelForm):
 
         fields = ('note_date',
                   'notes',
-                  'initials',
+                  'notes_by',
                  )
         widgets = {
             'note_date': DateInput(format=('%Y-%m-%d'),

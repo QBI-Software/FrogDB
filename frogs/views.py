@@ -22,7 +22,7 @@ try:
 except ImportError:
     from urllib import parse as urlparse # python3 support
 ### Local imports ###############################################################################
-from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype
+from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration
 from .forms import PermitForm, FrogForm, FrogDeathForm, FrogDisposalForm, OperationForm, TransferForm, ExperimentForm, FrogAttachmentForm, BulkFrogForm, BulkFrogDeleteForm, ExperimentDisposalForm, ExperimentAutoclaveForm, BulkFrogDisposalForm, BulkExptDisposalForm, NotesForm, AxesCaptchaForm, BulkExptAutoclaveForm
 from .tables import ExperimentTable,PermitTable,FrogTable,TransferTable, OperationTable,DisposalTable, FilteredSingleTableView, NotesTable, PermitReportTable
 from .filters import FrogFilter, PermitFilter, TransferFilter, ExperimentFilter, OperationFilter
@@ -524,8 +524,9 @@ class OperationFilterView(LoginRequiredMixin, FilteredSingleTableView):
         context = super(OperationFilterView, self).get_context_data(**kwargs)
         ops = Operation.objects.all().values_list('frogid')
         qs = Frog.objects.filter(gender='female') \
-            .filter(death_date__isnull=True) \
-            .filter(id__in=ops).order_by('-frogid')
+            .filter(death_date__isnull=True).order_by('pk')
+            # .filter(id__in=ops)
+
         table = OperationTable(qs, prefix='1-')
         RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         frogspecies = Species.objects.all()
@@ -542,6 +543,75 @@ class OperationFilterView(LoginRequiredMixin, FilteredSingleTableView):
         context['summaries'] = table
         context['summaries_sp'] = speciestables
         return context
+
+
+class OperationStatsView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'frogs/operation/operation_statistics.html'
+    raise_exception = True
+
+    def get_queryset(self, **kwargs):
+        qs = Frog.objects.filter(gender='female').filter(death__name='Alive')
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(OperationStatsView, self).get_context_data(**kwargs)
+        config = SiteConfiguration.objects.get()
+        qs = self.get_queryset()
+        frogspecies = Species.objects.all()
+        totals = []
+        operative=[]
+        isolation=[]
+        observation=[]
+        condition=[]
+        actualoperative=[]
+        sp_left = []
+        sp_opstates=[]
+        for sp in frogspecies:
+            keys = range(0,config.max_ops+1)
+            opstates = {k:0 for k in keys}
+            num = 0
+
+            qs_sp = qs.filter(species=sp)
+            totals.append(qs_sp.count())
+            #Get number operative
+            num_virgins = qs_sp.filter(operation__isnull=True).count()
+            qs_nonvirgins = qs_sp.filter(operation__isnull=False)
+            opstates[0]=num_virgins
+            for f in qs_nonvirgins:
+                if f.next_operation_OK:
+                    num += 1
+                #Get opstates
+                opstates[f.num_operations()]+= 1
+
+            operative.append(num_virgins+num)
+            #Get numbers
+            num_isolation = qs_sp.filter(remarks__icontains='isolation').count()
+            isolation.append(num_isolation)
+            num_observation = qs_sp.filter(remarks__icontains='observation').count()
+            observation.append(num_observation)
+            num_condition = qs_sp.filter(condition=True).count()
+            condition.append(num_condition)
+            actualoperative.append(num_virgins + num - num_isolation - num_observation - num_condition)
+            #Calculate total left
+            t = 0
+            for key, val in opstates.items():
+                t += (config.max_ops - key) * val
+            #print("DEBUG: left=", t)
+            opstates[config.max_ops]=t
+            sp_opstates.append(opstates)
+
+
+        context['species'] = frogspecies
+        context['total'] = totals
+        context['operative'] = operative
+        context['isolation'] = isolation
+        context['observation']= observation
+        context['condition']= condition
+        context['actualoperative']=actualoperative
+        context['operationstate']= sp_opstates
+
+        return context
+
 
 ## 1. Set frogid then 2. Increment opnum
 ## Limits: 6 operations and 6 mths apart - in Model

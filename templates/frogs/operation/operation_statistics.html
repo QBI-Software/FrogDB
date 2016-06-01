@@ -1,0 +1,87 @@
+{% extends "frogs/base.html" %}{% block title %}Operations{% endblock %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header"><h2>Colony Statistics as at {% now "d-M-Y" %}</h2></div>
+    <div class="well">
+
+  <table class="table table-striped">
+
+    <tr><th></th>
+
+        {% for sp in species %}
+            <th>{{sp.name}}</th>
+        {% endfor %}
+
+    </tr>
+      <tr>
+        <th>Total No of Frogs</th>
+
+          {% for t in total %}
+            <td>{{t}}</td>
+          {% endfor %}
+
+      </tr>
+    <tr>
+        <th>Frogs OK to operate on</th>
+
+          {% for t in operative %}
+            <td>{{t}}</td>
+          {% endfor %}
+
+      </tr>
+    <tr>
+        <th>Frogs in Isolation</th>
+
+          {% for t in isolation %}
+            <td>{{t}}</td>
+          {% endfor %}
+
+      </tr>
+    <tr>
+        <th>Frogs Under Observation</th>
+
+          {% for t in observation %}
+            <td>{{t}}</td>
+          {% endfor %}
+
+      </tr>
+    <tr>
+        <th>Frogs with poor oocytes/health conditions</th>
+
+          {% for t in condition %}
+            <td>{{t}}</td>
+          {% endfor %}
+
+      </tr>
+    <tr>
+        <th>Actual Frogs OK to operate on</th>
+
+          {% for t in actualoperative %}
+            <td>{{t}}</td>
+          {% endfor %}
+
+      </tr>
+  <tr>
+    <th>Operation State</th>
+
+     {% for ops in operationstate %}
+      <td>  <div class="well ">
+                <table class="table-condensed">
+                    {% for key,val in ops.items %}
+                    {% if key < site_config.max_ops %}
+                    <tr><th>Frogs with {{key}} ops</th><td>{{val}}</td></tr>
+                    {% else %}
+                    <tr><th>Total number operations left</th><td>{{val}}</td></tr>
+                    {% endif %}
+
+                    {% endfor %}
+                </table></div></td>
+          {% endfor %}
+
+        </div>
+</tr>
+</table>
+
+</div>{% endblock %}

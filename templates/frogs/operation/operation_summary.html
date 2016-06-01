@@ -4,6 +4,7 @@
 {% block content %}
 <div class="container">
     <div class="page-header"><h2>State of Operations as at {% now "d-M-Y" %}</h2></div>
+     <p><a href="{% url 'frogs:operation_stats' %}" class="btn btn-info">Statistics</a></p>
      <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="{% url 'frogs:operation_summary' %}#all">All</a></li>
 

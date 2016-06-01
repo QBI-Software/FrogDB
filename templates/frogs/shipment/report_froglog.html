@@ -42,10 +42,15 @@
                     <thead>
                     <tr>
                         <th>Frog ID</th>
-                        <th>QEN</th>
+                        <th>Source</th>
+                        <th>Date of arrival</th>
+                        <th>AQIS</th>
                         <th>AEC</th>
-                        <th>Autoclave Date</th>
-                        <th>Autoclave Run#</th>
+                        <th>Gender</th>
+                        {% if loc.name != 'Stored at AIBN Animal House' %}
+                        <th>Disposal Method</th>
+                        <th>Disposal Date</th>
+                        {% endif %}
                         {% if gender == 'female' %}
                         <th>Operation Details</th>
                         {% endif %}
@@ -57,11 +62,28 @@
                     {% if frog.gender == gender and frog.current_location == loc and frog.species.name == species %}
                     <tbody>
                     <tr style="background-color: {{frog.qen.color }}">
-                        <td>{{frog.frogid}}</td>
-                        <td>{{frog.qen}}</td>
+                        <td><a href="{% url 'frogs:frog_detail' frog.pk %}">{{frog.frogid}}</a></td>
+                        <td>{{frog.qen.supplier.name}}</td>
+                        <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
+                        <td>{{frog.qen.aqis}}</td>
                         <td>{{frog.aec}}</td>
+                        <td>{{frog.gender}}</td>
+                        {% if loc.name != 'Stored at AIBN Animal House' %}
+                        <td>{{frog.death.name}}
+                            {% if frog.disposed %}
+                             on {{frog.death_date|date:"d-M-Y"}}
+                                {% if frog.autoclave_run  %}
+                                    autoclaved (Run#{{frog.autoclave_run}})
+                                    {% if frog.incineration_date %}
+                                        and incinerated
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+
+                        </td>
                         <td>{{frog.autoclave_date}}</td>
-                        <td>{{frog.autoclave_run}}</td>
+                        {% endif %}
+                        {% if gender == 'female' %}
                         <td>
                             <table class="table-condensed">
                                 {% if frog.operation_set.count > 0 %}
@@ -70,8 +92,7 @@
                                     <th>No</th>
                                     <th>Initials</th>
                                     <th>Op Date</th>
-                                    <th>Oocytes Disposed</th>
-                                    <th>Autoclaved Samples</th>
+
                                 </tr>
                                 </thead>
                                 {% endif %}
@@ -81,9 +102,8 @@
                                 <tr>
                                     <td>{{ op.opnum }}</td>
                                     <td>{{ op.initials }}</td>
-                                    <td>{{ op.opdate }}</td>
-                                    <td>{{ op.get_expts_disposaldate_range }}</td>
-                                    <td>{{ op.get_number_autoclaved }}</td>
+                                    <td>{{ op.opdate|date:"d-M-Y" }}</td>
+
                                 </tr>
                                 {% empty %}
                                 <p>No operations performed</p>
@@ -92,6 +112,7 @@
                                 </tbody>
                             </table>
                         </td>
+                        {% endif %}
                     </tr>
                     </tbody>
                     {% endif %}

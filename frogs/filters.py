@@ -30,22 +30,27 @@ class FrogFilter(django_filters.FilterSet):
 
 class TransferFilter(django_filters.FilterSet):
     transfer_date = django_filters.DateFromToRangeFilter(label="Transfer Date (from-to)", widget=django_filters.widgets.RangeWidget(attrs={'class': 'myDateClass','type': 'date', 'placeholder': 'Select a date'} ),)
+    #frogid = django_filters.ChoiceFilter(choices= Frog.objects.filter(gender='female'))
 
     class Meta:
         model = Transfer
+        #fields = ['frogid']
 
 class ExperimentFilter(django_filters.FilterSet):
     transfer_date = django_filters.DateFromToRangeFilter(label="Transfer Date (from-to)", widget=django_filters.widgets.RangeWidget(attrs={'class': 'myDateClass','type': 'date', 'placeholder': 'Select a date'} ),)
 
+
     class Meta:
         model = Experiment
+
 
 ##TODO Custom fields based on calculated fields
 class OperationFilter(django_filters.FilterSet):
     opdate = django_filters.DateFromToRangeFilter(label="Operation Date (from-to)", widget=django_filters.widgets.RangeWidget(attrs={'class': 'myDateClass','type': 'date', 'placeholder': 'Select a date'} ),)
   #  numops = django_filters.NumericRangeFilter(label="Total ops (from-to)")
 
+
     class Meta:
         model = Frog
-        fields = ['frogid']
+        #fields = ['frogid']
         #,'num_operations','last_operation','next_operation']
