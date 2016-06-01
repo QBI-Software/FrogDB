@@ -47,7 +47,7 @@
                         <th>AQIS</th>
                         <th>AEC</th>
                         <th>Gender</th>
-                        {% if loc.name != 'Stored at AIBN Animal House' %}
+                        {% if 'Disposed' in loc.name %}
                         <th>Disposal Method</th>
                         <th>Disposal Date</th>
                         {% endif %}
@@ -68,7 +68,7 @@
                         <td>{{frog.qen.aqis}}</td>
                         <td>{{frog.aec}}</td>
                         <td>{{frog.gender}}</td>
-                        {% if loc.name != 'Stored at AIBN Animal House' %}
+                        {% if 'Disposed' in loc.name %}
                         <td>{{frog.death.name}}
                             {% if frog.disposed %}
                              on {{frog.death_date|date:"d-M-Y"}}
