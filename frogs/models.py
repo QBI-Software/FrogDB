@@ -19,8 +19,8 @@ def get_initials_from_user(uname):
         initials = "%s%s" % (uname.first_name[0], uname.last_name[0])
     else:
         initials = uname.username[0:1]
-    print("DEBUG: User=", uname)
-    print("DEBUG: Initials=", initials)
+    #print("DEBUG: User=", uname)
+    #print("DEBUG: Initials=", initials)
     return initials.upper()
 
 #######################################################################
@@ -139,6 +139,10 @@ class Permit(models.Model):
             .filter(operation__transfer__transferapproval__tfr_from__building=transferfrom)
         #print('DEBUG: transferred frogs=', frogs)
         return frogs.count()
+
+    def get_aec(self):
+        aecs = Frog.objects.filter(qen=self).order_by().values_list('aec', flat=True).distinct()
+        return ', '.join(aecs)
 
 
 class Frog(models.Model):

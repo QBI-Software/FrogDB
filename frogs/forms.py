@@ -6,6 +6,7 @@ from suit_ckeditor.widgets import CKEditorWidget
 from suit.widgets import HTML5Input
 from captcha.fields import CaptchaField
 from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment,Qap, Notes, SiteConfiguration
+from django.contrib.auth.models import User
 
 
 class LoginForm(AuthenticationForm):
@@ -113,6 +114,8 @@ class BulkFrogDeleteForm(ModelForm):
                    'species')
 
 class FrogDeathForm(ModelForm):
+    qs = User.objects.filter(groups__name__in=['GeneralStaff', 'AdminStaff'])
+    death_recorded_by = forms.ModelChoiceField(label='Recorded By', queryset=qs)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):
@@ -226,6 +229,8 @@ class FrogAttachmentForm(ModelForm):
 
 
 class OperationForm(ModelForm):
+    qs = User.objects.filter(groups__name__in=['GeneralStaff', 'AdminStaff'])
+    operated_by = forms.ModelChoiceField(label='Operated By', queryset=qs)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):
@@ -252,6 +257,8 @@ class OperationForm(ModelForm):
         }
 
 class TransferForm(ModelForm):
+    qs = User.objects.filter(groups__name__in=['GeneralStaff', 'AdminStaff'])
+    transporter = forms.ModelChoiceField(label='Transported By', queryset=qs)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):
@@ -357,6 +364,8 @@ class BulkExptDisposalForm(ModelForm):
     qs = Experiment.objects.filter(expt_disposed=False)
     expts = forms.ModelMultipleChoiceField(label='Select Waste',
              queryset=qs, widget=forms.CheckboxSelectMultiple())
+    qs = User.objects.filter(groups__name__in=['GeneralStaff', 'AdminStaff'])
+    disposal_sentby = forms.ModelChoiceField(label='Disposed By', queryset=qs)
 
     def __init__(self, *args, **kwargs):
         location = kwargs.pop('location', None)
@@ -420,6 +429,8 @@ class BulkExptAutoclaveForm(ModelForm):
         
 
 class NotesForm(ModelForm):
+    qs = User.objects.filter(groups__name__in=['GeneralStaff', 'AdminStaff'])
+    notes_by = forms.ModelChoiceField(label='Notes By', queryset=qs)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):

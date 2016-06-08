@@ -45,7 +45,6 @@
                         <th>Source</th>
                         <th>Date of arrival</th>
                         <th>AQIS</th>
-                        <th>AEC</th>
                         <th>Gender</th>
                         {% if 'Disposed' in loc.name %}
                         <th>Disposal Method</th>
@@ -66,7 +65,6 @@
                         <td>{{frog.qen.supplier.name}}</td>
                         <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
                         <td>{{frog.qen.aqis}}</td>
-                        <td>{{frog.aec}}</td>
                         <td>{{frog.gender}}</td>
                         {% if 'Disposed' in loc.name %}
                         <td>{{frog.death.name}}
