@@ -189,6 +189,11 @@ def change_password(request):
     template_response = views.password_change(request)
     # Do something with `template_response`
     return template_response
+
+def csrf_failure(request, reason=""):
+    ctx = {'title': 'CSRF Failure', 'message': 'Your browser does not accept cookies and this can be a problem in ensuring a secure connection.'}
+    template_name= 'admin/csrf_failure.html'
+    return render_to_response(template_name, ctx)
 ###########################################################################################
 #### PERMITS/SHIPMENTS
 
