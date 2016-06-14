@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 from django.contrib.auth.views import password_change,password_change_done,password_reset,password_reset_complete
 from django.contrib.auth.views import password_reset_confirm, password_reset_done
 from axes.decorators import watch_login
-from . import views, reports
+from . import views
 
 app_name = 'frogs'
 urlpatterns = [
