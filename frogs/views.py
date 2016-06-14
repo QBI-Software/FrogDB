@@ -54,15 +54,16 @@ class IndexView(generic.ListView):
         return Transfer.objects.count()
 
     def get_operations_ready_count(self):
-        alive = Frog.objects.filter(death_date__isnull=True).filter(gender='female')
+        alive = Frog.objects.filter(death_date__isnull=True)\
+            .filter(condition=False).filter(gender='female')
         #print("DEBUG: Alive=", alive.count())
         ready = []
         for f in alive:
             if (f.num_operations() == 0):
                 ready.append(f)
-            elif (f.num_operations() > 0):
+            else:
                 delta = f.next_operation() - date.today()
-                if delta.days < 0:
+                if delta.days <= 0:
                     ready.append(f)
         #print("DEBUG: Ready=", len(ready))
         return len(ready)
