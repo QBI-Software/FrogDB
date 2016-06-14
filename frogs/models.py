@@ -442,3 +442,6 @@ class Notes(models.Model):
 
     def __str__(self):
         return self.notes
+
+    def initials(self):
+        return get_initials_from_user(self.notes_by)
