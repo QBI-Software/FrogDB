@@ -115,5 +115,4 @@ urlpatterns = [
         views.NotesList.as_view(), name='notes_list'),
     url(r'^reports/froglog/(?P<species>[a-zA-Z\.]*)/$',
         views.ReportTableView.as_view(), name="froglog_report"),
-    url(r'reports/test/$', reports.test_view, name="test_report"),
     ]
