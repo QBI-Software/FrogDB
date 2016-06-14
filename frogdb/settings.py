@@ -38,12 +38,28 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'md^dz3_%^e1zxycka2#_9cq=o170h9bhvk^f-8x(%a$8+_lhce'
-
+#SECRET_KEY = 'md^dz3_%^e1zxycka2#_9cq=o170h9bhvk^f-8x(%a$8+_lhce'
+with open(os.path.join(BASE_DIR,'frogdb/secret.txt')) as f:
+    SECRET_KEY = f.read().strip()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['127.0.0.1',]
+# OVERRIDE EMAIL SETTINGS
+DEFAULT_FROM_EMAIL = 'qbidbadmin@frogdb.qbi.uq.edu.au'
+SERVER_EMAIL = 'errors@frogdb.qbi.uq.edu.au'
+ADMINS =[('LizCW','e.cooperwilliams@uq.edu.au')]
+ALLOWED_HOSTS = ['127.0.0.1','frogdb.qbi.uq.edu.au',]
+#secure SSL
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+os.environ['wsgi.url_scheme']= 'https'
+# EXTRA SECURITY SETTINGS
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+#SECURE_SSL_REDIRECT = True
+CSRF_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'DENY'
 
 
 # Application definition
@@ -153,8 +169,8 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'frogs/static')
 STATIC_URL = '/static/'
 
-MEDIA_URL = '/static/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'frogs/static/media')
+MEDIA_URL = 'static/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'frogs/media')
 LOGIN_REDIRECT_URL ='/'
 LOGIN_URL ='/'
 

@@ -50,6 +50,7 @@
 		  </ul>
 		  <div class="navbar-right">
             <p>Welcome, {{ user.username }}
+                <a class="btn btn-warning" href="{% url 'admin:password_change' %}">Change password</a>
             <a id="logoutbtn" class="btn btn-success" href="{% url 'frogs:logout' %}">Logout</a></p>
           </div>
         {% else %}
@@ -58,6 +59,7 @@
             {% for error in form.non_field_errors %}
                 {{ error }}
             {% endfor %}
+                <a href="{% url 'frogs:password_reset' %}">Lost password?</a>
           </p>
 
             {% endif %}

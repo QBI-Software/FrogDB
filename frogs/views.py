@@ -6,6 +6,7 @@ from django.views import generic
 from django_tables2 import RequestConfig
 from django.utils.http import is_safe_url
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import views
 from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
@@ -184,7 +185,10 @@ def locked_out(request):
 
     return render_to_response('frogs/locked.html', dict(form=form), context_instance=RequestContext(request))
 
-
+def change_password(request):
+    template_response = views.password_change(request)
+    # Do something with `template_response`
+    return template_response
 ###########################################################################################
 #### PERMITS/SHIPMENTS
 
@@ -227,6 +231,7 @@ class PermitDelete(LoginRequiredMixin, generic.DeleteView):
     model = Permit
     success_url = reverse_lazy("frogs:permit_list")
     raise_exception = True
+    template_name = 'frogs/shipment/permit_confirm_delete.html'
 
 # Frog Log Quarantine Report
 class ReportTableView(LoginRequiredMixin, generic.TemplateView):
@@ -337,6 +342,7 @@ class FrogUpdate(LoginRequiredMixin, generic.UpdateView):
 class FrogDelete(LoginRequiredMixin, generic.DeleteView):
     model = Frog
     success_url = reverse_lazy("frogs:frog_list")
+    template_name = 'frogs/frog/frog_confirm_delete.html'
     raise_exception = True
 
 class FrogDeath(LoginRequiredMixin, generic.UpdateView):
