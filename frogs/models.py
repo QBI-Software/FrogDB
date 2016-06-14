@@ -312,8 +312,9 @@ class Operation(models.Model):
             delta = self.opdate - self.frogid.last_operation()
             if delta.days < operation_interval:
                 err = "This operation is only %d days since the last operation (an interval of %d days is required )" % (delta.days, operation_interval)
-                print("DEBUG:", err)
-                raise ValidationError(err)
+                #print("DEBUG:", err)
+                return err
+                #raise ValidationError(err) #REMOVE PREVENTION - requires message only
 
     def get_number_expts(self):
         total = 0
