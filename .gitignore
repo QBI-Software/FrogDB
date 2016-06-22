@@ -1,3 +1,6 @@
 *.pyc
 .idea/*
 frogdb/settings.py
+frogs/media/*
+frogs/migrations/*
+frogs/static/media/*

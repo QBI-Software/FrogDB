@@ -5,7 +5,7 @@ from django.forms import Form, ModelForm, DateInput, ImageField
 from suit_ckeditor.widgets import CKEditorWidget
 from suit.widgets import HTML5Input
 from captcha.fields import CaptchaField
-from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment,Qap, Notes, SiteConfiguration
+from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment,Qap, Notes, SiteConfiguration,Species
 from django.contrib.auth.models import User
 
 
@@ -39,6 +39,7 @@ class PermitForm(ModelForm):
                   'males',
                   'supplier',
                   'country',
+                  'prefix',
                   'color')
         widgets = {
             'arrival_date': DateInput(format=('%Y-%m-%d'),
@@ -71,7 +72,6 @@ class FrogForm(ModelForm):
                   'current_location',
                   'condition',
                   'remarks',
-                  'aec',
                   'death'
                   )
 
@@ -96,7 +96,6 @@ class BulkFrogForm(ModelForm):
                   'tankid',
                   'species',
                   'current_location',
-                  'aec',
                   )
 
 
@@ -153,6 +152,7 @@ class FrogDisposalForm(ModelForm):
                   'disposed',
                   'autoclave_date',
                   'autoclave_run',
+                  'autoclave_comments',
                   'incineration_date',
                   'current_location'
                   )
@@ -188,6 +188,7 @@ class BulkFrogDisposalForm(ModelForm):
                    'disposed',
                    'autoclave_date',
                    'autoclave_run',
+                   'autoclave_comments',
                    'incineration_date',
                    'current_location'
                    )
@@ -441,6 +442,7 @@ class NotesForm(ModelForm):
         model = Notes
 
         fields = ('note_date',
+                  'notes_species',
                   'notes',
                   'notes_by',
                  )
@@ -456,8 +458,17 @@ class NotesForm(ModelForm):
 class SiteConfigurationForm(forms.ModelForm):
     class Meta:
         model = SiteConfiguration
-        fields = ('site_name','report_location','report_contact_details', 'report_general_notes','maintenance_mode')
+        fields =  '__all__'
+            #('site_name','report_location','report_contact_details', 'aec','maintenance_mode')
         widgets = {
             'report_contact_details': CKEditorWidget(editor_options={'startupFocus': True}),
-            'report_general_notes': CKEditorWidget(editor_options={'startupFocus': True}),
+        }
+
+class SpeciesForm(forms.ModelForm):
+    class Meta:
+        model = Species
+        fields =  '__all__'
+
+        widgets = {
+            'generalnotes': CKEditorWidget(editor_options={'startupFocus': True}),
         }

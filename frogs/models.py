@@ -30,10 +30,11 @@ class SiteConfiguration(SingletonModel):
     site_name = models.CharField(max_length=255, default='Site Name')
     report_location = models.CharField(max_length=1000, default='Location')
     report_contact_details = models.CharField(max_length=2000, default='Contact Details')
-    report_general_notes = models.CharField(max_length=5000, default='General Notes')
+    #report_general_notes = models.CharField(max_length=5000, default='General Notes')
     maintenance_mode = models.BooleanField(default=False)
     max_ops = models.SmallIntegerField(_("Max operations"), default=6)
     op_interval= models.SmallIntegerField(_("Operation interval (days)"), default=180)
+    aec = models.CharField(_("AEC"), max_length=80, null=True, blank=True)
 
     def __unicode__(self):
         return u"Site Configuration"
@@ -48,6 +49,7 @@ GENDERS=(('female','Female'),('male','Male'), ('unknown', 'Unknown'))
 class Qap(models.Model):
     qap = models.CharField(_("QAP"), max_length=80, primary_key=True)
     building = models.CharField(_("Building"), max_length=60, null=False)
+    ref = models.CharField(_("Ref"), max_length=10,null=False)
 
     def __str__(self):
         return self.building
@@ -67,6 +69,7 @@ class Country(models.Model):
 
 class Species(models.Model):
     name = models.CharField(_("Species"), unique=True, max_length=100)
+    generalnotes = models.TextField(_("General Notes"),null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -84,7 +87,7 @@ class Wastetype(models.Model):
         return self.name
 
 class Location(models.Model):
-    name = models.CharField(_("Current Location"), max_length=100)
+    name = models.CharField(_("Current Location"), max_length=200)
     brief = models.CharField(_("Abbreviation"), max_length=20)
 
     def __str__(self):
@@ -110,7 +113,7 @@ class Permit(models.Model):
     supplier = models.ForeignKey(Supplier, verbose_name="Supplier")
     country = models.ForeignKey(Country, verbose_name="Country")
     color = models.CharField(_("Colour"), max_length=20, unique=True, null=True, blank=True)
-
+    prefix = models.CharField(_("Prefix"), max_length=10, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.qen
@@ -131,19 +134,24 @@ class Permit(models.Model):
         return qs.count()
 
     def get_frogs_remaining(self):
-        return self.get_totalfrogs() - self.frogs_disposed() - self.get_frogs_transferred('AIBN')
+        return self.get_totalfrogs() - self.frogs_disposed()
 
-    def get_frogs_transferred(self, transferfrom='AIBN'):
-        frogs = Frog.objects.filter(qen=self)\
-            .filter(disposed=False)\
-            .filter(operation__transfer__transferapproval__tfr_from__building=transferfrom)
-        #print('DEBUG: transferred frogs=', frogs)
-        return frogs.count()
+    def get_females_remaining(self):
+        qs = Frog.objects.filter(qen=self).filter(gender='female').filter(disposed=True)
+        return self.females - qs.count()
 
-    def get_aec(self):
-        aecs = Frog.objects.filter(qen=self).order_by().values_list('aec', flat=True).distinct()
-        return ', '.join(aecs)
+    def get_males_remaining(self):
+        qs = Frog.objects.filter(qen=self).filter(gender='male').filter(disposed=True)
+        return self.males - qs.count()
 
+
+class PermitAttachment(models.Model):
+    permitid = models.ForeignKey(Permit, on_delete=models.CASCADE)
+    docfile = models.FileField(verbose_name="Document")
+    description = models.CharField(_("Description"), max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return self.docfile.filename
 
 class Frog(models.Model):
 
@@ -155,14 +163,13 @@ class Frog(models.Model):
     condition = models.BooleanField(_("Not Healthy"), default=False)
     remarks = models.TextField(_("General Remarks"),null=True, blank=True)
     qen = models.ForeignKey(Permit, verbose_name="QEN", on_delete=models.CASCADE, null=False)
-    aec = models.CharField(_("AEC"), max_length=80,null=True, blank=True)
     death = models.ForeignKey(Deathtype, verbose_name="Death",null=True, blank=True)
     death_date = models.DateField("Date of Death", null=True, blank=True)
-    #death_initials = models.CharField(_("Initials"), max_length=10, null=True, blank=True)
     death_recorded_by = models.ForeignKey(User, verbose_name="Death recorded by", related_name="death_recorded_by", null=True, blank=True)
     disposed = models.BooleanField(_("Disposed"), default=False)
     autoclave_date = models.DateField("Autoclave Date", null=True, blank=True)
     autoclave_run = models.PositiveIntegerField(_("Autoclave Run"), default=0, null=True, blank=True)
+    autoclave_comments = models.CharField(_("Autoclave Comments"), max_length=200, null=True)
     incineration_date = models.DateField(_("Incineration Date"), null=True, blank=True)
 
     def __str__(self):
@@ -283,7 +290,7 @@ class Operation(models.Model):
     opdate = models.DateField("Operation Date")
     anesthetic = models.CharField(_("Anesthetic"), max_length=30)
     volume = models.PositiveSmallIntegerField("Volume (ml)")
-    comments = models.TextField("Comments")
+    comments = models.TextField("Comments",null=True, blank=True)
     #initials = models.CharField(_("Operated by"), max_length=10)
     operated_by = models.ForeignKey(User, verbose_name="Operated by", related_name="operated_by")
 
@@ -423,7 +430,7 @@ class Experiment(models.Model):
     disposal_date = models.DateField("Disposal date", blank=True,null=True)
     waste_type = models.ForeignKey(Wastetype, verbose_name="Type of waste", blank=True,null=True)
     waste_content = models.CharField(_("Waste content"), max_length=30, blank=True,null=True)
-    waste_qty = models.PositiveSmallIntegerField(_("Waste quantity"), blank=True, null=True)
+    waste_qty = models.PositiveSmallIntegerField(_("Waste quantity (L)"), blank=True, null=True)
     autoclave_indicator = models.BooleanField("Autoclave indicator", default=False)
     autoclave_complete = models.BooleanField("Autoclave complete", default=False)
 
@@ -437,9 +444,10 @@ class Experiment(models.Model):
 
 class Notes(models.Model):
     note_date = models.DateField("Notes date")
-    notes = models.CharField(_("Notes"), max_length=500, blank=True, null=True)
+    notes = models.TextField(_("Notes"), blank=True, null=True)
     #initials = models.CharField(_("Initials"), max_length=10, blank=True, null=True)
     notes_by = models.ForeignKey(User, verbose_name="Recorded by", related_name="notes_by")
+    notes_species = models.ForeignKey(Species, on_delete=models.CASCADE, verbose_name="Species")
 
     def __str__(self):
         return self.notes

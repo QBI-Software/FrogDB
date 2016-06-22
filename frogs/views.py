@@ -23,7 +23,7 @@ try:
 except ImportError:
     from urllib import parse as urlparse # python3 support
 ### Local imports ###############################################################################
-from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration
+from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration,Qap
 from .forms import PermitForm, FrogForm, FrogDeathForm, FrogDisposalForm, OperationForm, TransferForm, ExperimentForm, FrogAttachmentForm, BulkFrogForm, BulkFrogDeleteForm, ExperimentDisposalForm, ExperimentAutoclaveForm, BulkFrogDisposalForm, BulkExptDisposalForm, NotesForm, AxesCaptchaForm, BulkExptAutoclaveForm
 from .tables import ExperimentTable,PermitTable,FrogTable,TransferTable, OperationTable,DisposalTable, FilteredSingleTableView, NotesTable, PermitReportTable
 from .filters import FrogFilter, PermitFilter, TransferFilter, ExperimentFilter, OperationFilter
@@ -257,11 +257,14 @@ class ReportTableView(LoginRequiredMixin, generic.TemplateView):
         context = super(ReportTableView, self).get_context_data(**kwargs)
         table = PermitReportTable(self.get_queryset())
         RequestConfig(self.request).configure(table)
-        notes_table = NotesTable(Notes.objects.all().order_by('-note_date'))
+        species = self.kwargs.get('species')
+        sp = Species.objects.get(name=species)
+        notes_table = NotesTable(Notes.objects.filter(notes_species__name=species).order_by('-note_date'))
         RequestConfig(self.request).configure(notes_table)
 
-        context['species'] = self.kwargs.get('species')
+        context['species'] = species
         context['frognotes_table'] = notes_table
+        context['generalnotes'] = sp.generalnotes
         context['table'] = table
         context['locations'] = Location.objects.all()
         context['genders'] =['female','male']
@@ -407,7 +410,7 @@ class FrogBulkCreate(LoginRequiredMixin, generic.FormView):
         tankid = int(form.cleaned_data['tankid'])
         species = form.cleaned_data['species']
         location = form.cleaned_data['current_location']
-        aec = form.cleaned_data['aec']
+       # aec = form.cleaned_data['aec']
         deathtype = Deathtype.objects.filter(name='Alive')[0]
         bulk_list=[]
         #Check initial prefix unique
@@ -431,7 +434,7 @@ class FrogBulkCreate(LoginRequiredMixin, generic.FormView):
             frog.remarks='auto-generated'
             if (deathtype is not None):
                 frog.death=deathtype
-            frog.aec=aec
+           # frog.aec=aec
             #print('DEBUG: Generated:Frog=',frog.frogid)
             bulk_list.append(frog)
 
@@ -790,8 +793,11 @@ class ExperimentTracking(LoginRequiredMixin, generic.ListView):
         config = RequestConfig(self.request, paginate={"per_page": 20})
         tablelist ={}
         num = 1
-        buildings =['All','QBI','IMB'] #Hard coded but could read from config list
-        for bld in sorted(buildings):
+        qaps = Qap.objects.values_list('building', flat=True).order_by('building')
+        buildings =['All']
+        for q in qaps:
+            buildings.append(q)
+        for bld in buildings:
             pfx = '%d-' % num
             if (bld == 'All'):        
                 table = ExperimentTable(qs, prefix=pfx)
@@ -882,7 +888,11 @@ class DisposalList(LoginRequiredMixin, generic.ListView):
         config = RequestConfig(self.request, paginate={"per_page": 20})
         tablelist ={}
         num = 1
-        buildings =['All','QBI','IMB'] #Hard coded but could read from config list
+        qaps = Qap.objects.values_list('building', flat=True).order_by('building')
+        buildings = ['All']
+        for q in qaps:
+            buildings.append(q)
+       # buildings =['All','QBI','IMB'] #Hard coded but could read from config list
         for bld in sorted(buildings):
             pfx = '%d-' % num
             if (bld == 'All'):        
@@ -929,9 +939,6 @@ class BulkDisposal(LoginRequiredMixin, generic.FormView):
             expt.waste_type = form.cleaned_data['waste_type']
             expt.waste_content = form.cleaned_data['waste_content']
             expt.waste_qty = form.cleaned_data['waste_qty']
-            #expt.autoclave_indicator = form.cleaned_data['autoclave_indicator']
-            #expt.autoclave_complete = form.cleaned_data['autoclave_complete']
-            #print('Updated:Expt=', expt.id)
             expt.save()
 
         return super(BulkDisposal, self).form_valid(form)

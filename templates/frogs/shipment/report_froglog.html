@@ -8,7 +8,11 @@
         <p class="report-header">Quarantine Sample Register<br/>Declared pest species - Log<br/>University of Queensland
         </p>
         <h2 class="report-title">{{ species }}</h2>
-<div class="report-location">{{ site_config.report_location }}</div></div>
+        <div class="report-location">{{ site_config.report_location|force_escape }}</div>
+        {% if site_config.aec %}
+        <div class="report-aec">AEC: {{ site_config.aec|force_escape }}</div>
+        {% endif %}
+    </div>
 
     <div class="panel panel-success">
         <div class="panel-heading"><h4 class="panel-title">Contacts</h4></div>
@@ -23,7 +27,7 @@
     </div>
     <div class="panel panel-warning">
         <div class="panel-heading"><h3 class="panel-title">General Notes</h3></div>
-        <div class="panel-body">{{ site_config.report_general_notes|safe }}</div>
+        <div class="panel-body">{{ generalnotes|safe }}</div>
     </div>
     {% if frognotes_table %}
     <div class="panel panel-info">
@@ -34,7 +38,7 @@
 
     {% for loc in locations %}
     <div class="panel panel-primary">
-        <div class="panel-heading"><h2 class="panel-title">{{ loc.name }}</h2></div>
+        <div class="panel-heading"><h2 class="panel-title">{{ loc.name|force_escape }}</h2></div>
 
             {% for gender in genders %}
             <div class="well"><h3 class="panel-title">{{ gender|capfirst }}</h3>
@@ -44,7 +48,7 @@
                         <th>Frog ID</th>
                         <th>Source</th>
                         <th>Date of arrival</th>
-                        <th>AQIS</th>
+                        <th>QEN</th>
                         <th>Gender</th>
                         {% if 'Disposed' in loc.name %}
                         <th>Disposal Method</th>
@@ -64,7 +68,7 @@
                         <td><a href="{% url 'frogs:frog_detail' frog.pk %}">{{frog.frogid}}</a></td>
                         <td>{{frog.qen.supplier.name}}</td>
                         <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
-                        <td>{{frog.qen.aqis}}</td>
+                        <td>{{frog.qen}}</td>
                         <td>{{frog.gender}}</td>
                         {% if 'Disposed' in loc.name %}
                         <td>{{frog.death.name}}
@@ -72,6 +76,9 @@
                              on {{frog.death_date|date:"d-M-Y"}}
                                 {% if frog.autoclave_run  %}
                                     autoclaved (Run#{{frog.autoclave_run}})
+                                    {% if frog.autoclave_comments %}
+                                       &nbsp; {{frog.autoclave_comments}}
+                                    {% endif %}
                                     {% if frog.incineration_date %}
                                         and incinerated
                                     {% endif %}
@@ -79,7 +86,7 @@
                             {% endif %}
 
                         </td>
-                        <td>{{frog.autoclave_date}}</td>
+                        <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
                         {% endif %}
                         {% if gender == 'female' %}
                         <td>

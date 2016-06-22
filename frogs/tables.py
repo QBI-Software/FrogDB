@@ -77,12 +77,12 @@ class FilteredSingleTableView(tables.SingleTableView):
 
 class PermitTable(tables.Table):
     id = tables.LinkColumn('frogs:permit_detail', text='View', args=[A('pk')], verbose_name='' )
-
+    arrival_date = tables.DateColumn(format='d-M-Y')
 
     class Meta:
         model = Permit
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['aqis','qen','females','males', 'arrival_date','species','supplier','country','id']
+        fields = ['color','aqis','qen','females','males', 'arrival_date','species','supplier','country','id']
 
         order_by_field = 'arrival_date'
         sortable = True
@@ -96,17 +96,16 @@ class SummingColumn(tables.Column):
 class PermitReportTable(tables.Table):
     aqis = tables.LinkColumn('frogs:permit_detail', accessor=A('aqis'),  args=[A('pk')], verbose_name='AQIS Permit #' )
     qen = tables.Column(footer="Total Frogs:")
-    get_aec = tables.Column(verbose_name='AEC')
     get_totalfrogs = SummingColumn(verbose_name="Shipped/Born")
     frogs_disposed = SummingColumn(verbose_name="Disposed")
-    get_frogs_remaining = SummingColumn(verbose_name="Remaining")
-    get_frogs_transferred = SummingColumn(verbose_name="Transferred")
+    get_females_remaining = SummingColumn(verbose_name="Remaining (Female)")
+    get_males_remaining = SummingColumn(verbose_name="Remaining (Male)")
     arrival_date = tables.DateColumn(format='d-M-Y')
 
     class Meta:
         model = Permit
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['aqis','qen', 'get_aec', 'arrival_date','get_totalfrogs','frogs_disposed', 'get_frogs_transferred','get_frogs_remaining',]
+        fields = ['aqis','qen', 'arrival_date','get_totalfrogs','frogs_disposed', 'get_females_remaining','get_males_remaining',]
 
         order_by_field = 'arrival_date'
         sortable = True
@@ -146,7 +145,7 @@ class NotesTable(tables.Table):
     class Meta:
         model = Notes
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['note_date','notes','initials']
+        fields = ['note_date','notes_species','notes','initials']
 
         order_by_field = '-note_date'
         sortable = True
