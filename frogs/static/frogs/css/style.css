@@ -45,15 +45,19 @@ footer p{
 */
 .form-control input {
 }
+a.glyphicon:hover{
+    text-decoration:none;
+}
+a.glyphicon:active{
+    text-decoration:none;
+}
 .list-group-item{
     min-width:200px;
     }
 .helptext{
     display:none;
 }
-#id_current_location{
- max-width:200px;
- }
+
 .sidebar{
     margin-left: 30px;
 }
@@ -80,9 +84,7 @@ ul.errorlist{
     margin-bottom: 20px;
     border: 1px solid #ebccd1;
     border-radius: 4px;
-}
-ul.errorlist li{
-    list-display-type:none !important;
+    list-display-type:none;
     }
 
 /**Report **/

@@ -79,10 +79,14 @@ class PermitTable(tables.Table):
     id = tables.LinkColumn('frogs:permit_detail', text='View', args=[A('pk')], verbose_name='' )
     arrival_date = tables.DateColumn(format='d-M-Y')
 
+    def render_color(self, value):
+        print("DEBUG: COlor=", value)
+        return format_html("<span style='display:block; background-color:%s'>%s</span>" % (value, value))
+
     class Meta:
         model = Permit
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['color','aqis','qen','females','males', 'arrival_date','species','supplier','country','id']
+        fields = ['color','aqis','qen','prefix','females','males', 'arrival_date','species','supplier','country','id']
 
         order_by_field = 'arrival_date'
         sortable = True

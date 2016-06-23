@@ -1,3 +1,4 @@
+import os
 from datetime import date, datetime, timedelta
 from django.db import models
 from django.db.models import Count
@@ -67,12 +68,18 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "Countries"
+
 class Species(models.Model):
     name = models.CharField(_("Species"), unique=True, max_length=100)
     generalnotes = models.TextField(_("General Notes"),null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = "Species"
 
 class Imagetype(models.Model):
     name = models.CharField(_("Image Type"), max_length=100)
@@ -151,7 +158,18 @@ class PermitAttachment(models.Model):
     description = models.CharField(_("Description"), max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return self.docfile.filename
+        return os.path.basename(self.docfile.name)
+
+    def getextension(self):
+        ext = os.path.splitext(self.docfile.name)[1]  # [0] returns path+filename
+       # print("DEBUG:ext=", ext)
+        return ext
+
+    def clean(self):
+        ext = self.getextension()
+        valid_extensions = ['.pdf', '.doc', '.docx', '.txt']
+        if not ext.lower() in valid_extensions:
+            raise ValidationError(u'Unsupported file type (only pdf, doc, txt).')
 
 class Frog(models.Model):
 
@@ -271,6 +289,10 @@ class FrogAttachment(models.Model):
     def __str__(self):
         return self.imagetype
 
+    def getextension(self):
+        ext = os.path.splitext(self.imgfile.name)[1]  # [0] returns path+filename
+        return ext
+
     def clean(self):
         #Check if replacing an image or new
         #Get frog - get images - get type
@@ -281,8 +303,11 @@ class FrogAttachment(models.Model):
             dorsal.delete()
         elif ventral is not None and self.imagetype.name =='Ventral':
             ventral.delete()
-
-
+        # Only allow images which can be rendered in browser
+        ext = self.getextension()
+        valid_extensions = ['.jpf', '.png', '.gif', '.jpeg']
+        if not ext.lower() in valid_extensions:
+            raise ValidationError(u'Unsupported image type.')
 
 class Operation(models.Model):
     frogid = models.ForeignKey(Frog, on_delete=models.CASCADE)

@@ -1,10 +1,14 @@
+import os
+import mimetypes
 from django.shortcuts import get_object_or_404, render, redirect, resolve_url, render_to_response
 from django.db import IntegrityError
 from django.core.urlresolvers import reverse_lazy, reverse, clear_url_caches
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from wsgiref.util import FileWrapper
 from django.views import generic
 from django_tables2 import RequestConfig
 from django.utils.http import is_safe_url
+from django.utils.encoding import smart_str
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import views
 from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout, authenticate
@@ -23,8 +27,8 @@ try:
 except ImportError:
     from urllib import parse as urlparse # python3 support
 ### Local imports ###############################################################################
-from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration,Qap
-from .forms import PermitForm, FrogForm, FrogDeathForm, FrogDisposalForm, OperationForm, TransferForm, ExperimentForm, FrogAttachmentForm, BulkFrogForm, BulkFrogDeleteForm, ExperimentDisposalForm, ExperimentAutoclaveForm, BulkFrogDisposalForm, BulkExptDisposalForm, NotesForm, AxesCaptchaForm, BulkExptAutoclaveForm
+from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration, Qap, PermitAttachment
+from .forms import PermitForm, FrogForm, FrogDeathForm, FrogDisposalForm, OperationForm, TransferForm, ExperimentForm, FrogAttachmentForm, BulkFrogForm, BulkFrogDeleteForm, ExperimentDisposalForm, ExperimentAutoclaveForm, BulkFrogDisposalForm, BulkExptDisposalForm, NotesForm, AxesCaptchaForm, BulkExptAutoclaveForm, PermitAttachmentForm
 from .tables import ExperimentTable,PermitTable,FrogTable,TransferTable, OperationTable,DisposalTable, FilteredSingleTableView, NotesTable, PermitReportTable
 from .filters import FrogFilter, PermitFilter, TransferFilter, ExperimentFilter, OperationFilter
 ###AUTHORIZATION CLASS ##########################################################################
@@ -33,6 +37,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 # import the logging library
 import logging
+
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -239,6 +244,53 @@ class PermitDelete(LoginRequiredMixin, generic.DeleteView):
     raise_exception = True
     template_name = 'frogs/shipment/permit_confirm_delete.html'
 
+class PermitAttachmentView(LoginRequiredMixin, generic.CreateView):
+    model = PermitAttachment
+    form_class = PermitAttachmentForm
+    context_object_name = 'permit'
+    template_name = 'frogs/shipment/shipment_upload.html'
+    raise_exception = True
+
+
+    def get_success_url(self):
+        return reverse('frogs:permit_detail', args=[self.object.permitid.pk])
+
+    def get_initial(self):
+        fid = self.kwargs.get('permitid')
+        permit = Permit.objects.get(pk=fid)
+        return {'permitid': permit}
+
+class PermitAttachmentDelete(LoginRequiredMixin, generic.DeleteView):
+    model = PermitAttachment
+    raise_exception = True
+    template_name = 'frogs/shipment/permitattachment_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('frogs:permit_detail', args=[self.object.permitid.pk])
+
+
+def download(request, permitattachmentid):
+    f = PermitAttachment.objects.get(pk=permitattachmentid)
+    print("DEBUG: download=", f.docfile)
+    #f.write(p.body)
+    fname = os.path.basename(f.docfile.name)
+    print("DEBUG: filename=", fname)
+    docname = os.path.join(settings.MEDIA_ROOT, fname)
+    print("DEBUG: pathname=", docname)
+    print("DEBUG: file exists=", os.path.exists(docname))
+    size = os.path.getsize(docname)
+    print("DEBUG: file size=",size)
+    fw = FileWrapper(open(docname))
+    print("DEBUG: fw=", fw)
+    response = HttpResponse(fw, content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=%s' % fname
+    response['Content-Length'] = size
+    response['X-SendFile-Encoding: url'] = docname
+
+    return response
+
+
+############################################################################
 # Frog Log Quarantine Report
 class ReportTableView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'frogs/shipment/report_froglog.html'
@@ -250,7 +302,7 @@ class ReportTableView(LoginRequiredMixin, generic.TemplateView):
             qs = Permit.objects.all()
         else:
             qs = Permit.objects.filter(species__name=species)
-
+        qs.order_by('arrival_date')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -268,7 +320,7 @@ class ReportTableView(LoginRequiredMixin, generic.TemplateView):
         context['table'] = table
         context['locations'] = Location.objects.all()
         context['genders'] =['female','male']
-        context['frogs_table']= Frog.objects.all()
+        context['frogs_table']= Frog.objects.all().order_by('frogid')
         return context
 
     # def pdfview(self, request):
@@ -297,7 +349,7 @@ class FrogList(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         #print('DEBUG:kwargs', self.kwargs)
-        qs = Frog.objects.all()
+        qs = Frog.objects.all().order_by('frogid')
         if (self.kwargs.get('shipmentid')):
             sid = self.kwargs.get('shipmentid')
             shipment = Permit.objects.get(pk=sid)
@@ -450,7 +502,7 @@ class FrogBulkCreate(LoginRequiredMixin, generic.FormView):
         fid = self.kwargs.get('shipmentid')
         shipment = Permit.objects.get(pk=fid)
         #print('DEBUG: Shipment qen:', shipment.qen)
-        return {'qen': shipment, 'species': shipment.species}
+        return {'qen': shipment, 'species': shipment.species, 'prefix': shipment.prefix}
 
     def get_success_url(self):
         return reverse('frogs:frog_list_byshipment',kwargs={'shipmentid': self.fid})

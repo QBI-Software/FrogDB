@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.conf import settings
 from django.contrib.auth.views import password_change,password_change_done,password_reset,password_reset_complete
 from django.contrib.auth.views import password_reset_confirm, password_reset_done
 from axes.decorators import watch_login
@@ -17,6 +18,8 @@ urlpatterns = [
     url('^password_reset/done/$', password_reset_done, name='password_reset_done'),
     url('^reset/(?P<uidb64>[0-9A-Za-z\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', password_reset_confirm, {'template_name':'admin/password_reset_email.html'}, name='password_reset_confirm'),
     url('^reset/done/$', password_reset_complete, {'template_name':'admin/password_reset_complete.html'}, name='password_reset_complete'),
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+    {'document_root': settings.MEDIA_ROOT}),
     url(r'^permit/create/$',
         views.PermitCreate.as_view(), name="permit_create"),
     url(r'^permit/(?P<pk>\d+)/$',
@@ -27,6 +30,12 @@ urlpatterns = [
         views.PermitDelete.as_view(), name="permit_delete"),
     url(r'^permit/list/$',
         views.PermitList.as_view(), name='permit_list'),
+    url(r'^permit/upload/(?P<permitid>\w+)/$',
+        views.PermitAttachmentView.as_view(), name="permit_upload"),
+    url(r'^permit/download/(?P<permitattachmentid>\w+)/$',
+        views.download, name="permit_download"),
+    url(r'^permit/attachmentdelete/(?P<pk>\d+)/$',
+        views.PermitAttachmentDelete.as_view(), name="permitattachment_delete"),
     url(r'^frog/list/$',
         views.FrogFilterView.as_view(), name='frog_list'),
     url(r'^frog/filteredlist/$',
