@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.views import password_change,password_change_done,password_reset,password_reset_complete
 from django.contrib.auth.views import password_reset_confirm, password_reset_done
 from axes.decorators import watch_login
+from django.conf.urls.static import static
 from . import views
 
 app_name = 'frogs'
@@ -32,8 +33,6 @@ urlpatterns = [
         views.PermitList.as_view(), name='permit_list'),
     url(r'^permit/upload/(?P<permitid>\w+)/$',
         views.PermitAttachmentView.as_view(), name="permit_upload"),
-    url(r'^permit/download/(?P<permitattachmentid>\w+)/$',
-        views.download, name="permit_download"),
     url(r'^permit/attachmentdelete/(?P<pk>\d+)/$',
         views.PermitAttachmentDelete.as_view(), name="permitattachment_delete"),
     url(r'^frog/list/$',
@@ -124,4 +123,4 @@ urlpatterns = [
         views.NotesList.as_view(), name='notes_list'),
     url(r'^reports/froglog/(?P<species>[a-zA-Z\.]*)/$',
         views.ReportTableView.as_view(), name="froglog_report"),
-    ]
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

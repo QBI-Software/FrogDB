@@ -9,7 +9,7 @@
 
                 <fieldset data-role="controlgroup">
                     <legend>Select Frogs for disposal:</legend>
-
+                    <input type="checkbox" name="select_all" id="select_all" onChange='changeAll(this);'>Select All</input>
                     {{ form.as_p }}
                 </fieldset>
 
@@ -25,4 +25,15 @@
 
         </div>
     </div>
-</div>{% endblock %}
+</div>
+<script type="text/javascript" >
+function changeAll(cb){
+
+  checkboxes = document.getElementsByName('frogs');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = cb.checked;
+  }
+}
+
+</script>
+{% endblock %}

@@ -137,7 +137,6 @@ class Permit(models.Model):
 
     def frogs_disposed(self):
         qs = Frog.objects.filter(qen=self).filter(disposed=True)
-        #print('DEBUG: frogs_disposed=', qs.count())
         return qs.count()
 
     def get_frogs_remaining(self):
@@ -171,6 +170,11 @@ class PermitAttachment(models.Model):
         if not ext.lower() in valid_extensions:
             raise ValidationError(u'Unsupported file type (only pdf, doc, txt).')
 
+    def docfile_delete(**kwargs):
+        print("DEBUG:Called docfile_delete:", kwargs)
+
+
+
 class Frog(models.Model):
 
     frogid = models.CharField(_("Frog ID"), max_length=30, unique=True)
@@ -178,7 +182,7 @@ class Frog(models.Model):
     gender = models.CharField(_("Gender"), max_length=10, choices=GENDERS)
     current_location = models.ForeignKey(Location, verbose_name="Current Location", null=False)
     species = models.ForeignKey(Species, verbose_name="Species", null=False)
-    condition = models.BooleanField(_("Not Healthy"), default=False)
+    condition = models.BooleanField(_("Poorly"), default=False)
     remarks = models.TextField(_("General Remarks"),null=True, blank=True)
     qen = models.ForeignKey(Permit, verbose_name="QEN", on_delete=models.CASCADE, null=False)
     death = models.ForeignKey(Deathtype, verbose_name="Death",null=True, blank=True)
@@ -223,15 +227,17 @@ class Frog(models.Model):
         config = SiteConfiguration.objects.get()
         operation_interval = config.op_interval
         max = config.max_ops
+        if self.operation_set.count() >= max:
+            return 0
         if operation_interval is None:
             operation_interval = 180 #hardcoded default in days
         lastop = self.last_operation()
         d = timedelta(days=operation_interval)
-        if lastop is not None: # and lastop.opnum <= max:
+        if lastop is not None:
             nextop = lastop + d
             return nextop
         else:
-            return None
+            return date.today()
 
     def next_operation_OK(self):
         nextop = self.next_operation()
@@ -242,6 +248,14 @@ class Frog(models.Model):
                 rtn = False
         return rtn
 
+    def get_disposed(self):
+        if (self.death.name != "Alive"):
+            if (not self.disposed):
+                return 2
+            else:
+                return 1
+        else:
+            return 0
 
     def dorsalimage(self):
         return self.get_image('Dorsal')
@@ -261,15 +275,14 @@ class Frog(models.Model):
     def initials(self):
         return get_initials_from_user(self.death_recorded_by)
 
+    def sorted_operation_set(self):
+        return self.operation_set.all().order_by('opnum')
+
     #Validation
     def clean(self):
         if self.death_date is not None:
-            #print("DEBUG: Validating death_date:", self.death_date)
             deathdate = self.death_date #datetime.strptime(self.death_date, "%Y-%m-%d").date()
             delta = date.today() - self.death_date #datetime.strptime(self.death_date, "%Y-%m-%d").date()
-            #print("DEBUG: Validating death_date:deltadays=", delta.days)
-            #print("DEBUG: Validating death_date:arrival=", self.qen.arrival_date)
-            #print("DEBUG: Validating death_date:lastop=", self.last_operation())
             if delta.days < 0:
                 raise ValidationError("Date of death selected is in the future")
             if deathdate < self.qen.arrival_date:
@@ -323,6 +336,7 @@ class Operation(models.Model):
         opref = "Frog %s Operation %d" % (self.frogid, self.opnum)
         return opref
 
+
     def clean(self):
         #clean opnum
         config = SiteConfiguration.objects.get()
@@ -333,8 +347,8 @@ class Operation(models.Model):
         if (self.frogid.operation_set.count() > 0):
             for n in self.frogid.operation_set.all():
                 nums.append(n.opnum)
-            if self.opnum in nums:
-                raise ValidationError("An operation %d already exists for this frog" % self.opnum)
+            #if self.opnum in nums:
+           #     raise ValidationError("An operation %d already exists for this frog" % self.opnum)
 
         #clean opdate
         operation_interval = config.op_interval
@@ -344,7 +358,6 @@ class Operation(models.Model):
             delta = self.opdate - self.frogid.last_operation()
             if delta.days < operation_interval:
                 err = "This operation is only %d days since the last operation (an interval of %d days is required )" % (delta.days, operation_interval)
-                #print("DEBUG:", err)
                 return err
                 #raise ValidationError(err) #REMOVE PREVENTION - requires message only
 
@@ -466,6 +479,10 @@ class Experiment(models.Model):
 
     def initials(self):
         return get_initials_from_user(self.disposal_sentby)
+
+    def location(self):
+        loc = "%s (%s)" % (self.expt_location.building, self.expt_location.ref)
+        return loc
 
 class Notes(models.Model):
     note_date = models.DateField("Notes date")

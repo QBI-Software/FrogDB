@@ -103,7 +103,7 @@
                                 {% endif %}
                                 <tbody>
                                 {% if gender == 'female' %}
-                                {% for op in frog.operation_set.all %}
+                                {% for op in frog.sorted_operation_set.all %}
                                 <tr>
                                     <td>{{ op.opnum }}</td>
                                     <td>{{ op.initials }}</td>

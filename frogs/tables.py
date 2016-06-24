@@ -1,8 +1,11 @@
 import django_tables2 as tables
-from django_tables2.utils import A
-from django.utils.html import format_html
+from django_tables2.utils import A, AttributeDict
+from django.utils.html import format_html, escape
 from datetime import date
+from django.utils.safestring import mark_safe
+
 from .models import Transfer,Experiment,Frog,Permit, Notes
+from .models import SiteConfiguration
 
 class ExperimentTable(tables.Table):
     #selection = tables.CheckBoxColumn(accessor="pk", orderable=False)
@@ -17,11 +20,19 @@ class ExperimentTable(tables.Table):
     received = tables.Column(verbose_name='Received (ml)')
     transferred = tables.Column(verbose_name='Transferred (ml)')
     used = tables.Column(verbose_name='Used (ml)')
+    location = tables.Column(verbose_name='Experiment Location', accessor=A('location'))
+
+    def render_expt_disposed(self, value):
+        val = bool(value)
+        if val:
+            return format_html('<span style="color:green">&#10004</span>')
+        else:
+            return format_html('<span style="color:red">&#10071</span>')
 
     class Meta:
         model = Experiment
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['expt_location','transfer_date','frogid','species','received','transferred','used','expt_from','expt_to','expt_disposed','id']
+        fields = ['location','transfer_date','frogid','species','received','transferred','used','expt_from','expt_to','expt_disposed','id']
 
 
 class DisposalTable(tables.Table):
@@ -29,11 +40,26 @@ class DisposalTable(tables.Table):
     frogid = tables.Column(verbose_name='Frog ID', accessor=A('transferid.operationid.frogid.frogid'))
     qen = tables.Column(verbose_name='QEN', accessor=A('transferid.operationid.frogid.qen'))
     disposal_date = tables.DateColumn(verbose_name="Disposal Date", format='d-M-Y')
-    
+    location = tables.Column(verbose_name='Experiment Location', accessor=A('location'))
+
+    def render_autoclave_indicator(self, value):
+        val = bool(value)
+        if val:
+            return format_html('<span style="color:green">&#10004</span>')
+        else:
+            return format_html('<span style="color:red">&#10071</span>')
+
+    def render_autoclave_complete(self, value):
+        val = bool(value)
+        if val:
+            return format_html('<span style="color:green">&#10004</span>')
+        else:
+            return format_html('<span style="color:red">&#10071</span>')
+
     class Meta:
         model = Experiment
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['expt_location','disposal_date','qen','frogid','waste_type','waste_content','waste_qty','autoclave_indicator','autoclave_complete','disposal_sentby','id']
+        fields = ['location','disposal_date','qen','frogid','waste_type','waste_content','waste_qty','autoclave_indicator','autoclave_complete','disposal_sentby','id']
 
 
 class TransferTable(tables.Table):
@@ -52,12 +78,31 @@ class TransferTable(tables.Table):
 class FrogTable(tables.Table):
     #selectfrog = tables.CheckBoxColumn(accessor='pk')
     frogid = tables.LinkColumn('frogs:frog_detail', args=[A('pk')])
+    get_disposed = tables.Column(verbose_name="Disposed", accessor=A('get_disposed'), orderable=True)
+
+    def render_condition(self, value):
+        val = bool(value)
+        if val:
+            return format_html('<span style="color:red">&#10071</span>')
+        else:
+            return format_html('<span></span>')
+
+    def render_get_disposed(self, value):
+
+        if value == 1: #dead and disposed
+            return format_html('<span style="color:green">&#10004</span>')
+        elif value == 2: #dead but not disposed
+            return format_html('<span style="color:red">&#10071</span>')
+        else: #alive
+            return format_html('<span></span>')
+
+
     class Meta:
         model = Frog
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['frogid','tankid','gender','species','current_location','condition','remarks','qen','aec','death','disposed']
-        order_by_field = 'frogid'
-        sortable = True
+        fields = ['frogid','tankid','gender','species','current_location','condition','remarks','qen','death','get_disposed']
+        #order_by_field = 'frogid'
+        sortable = False
 
 #Generic filtered table
 class FilteredSingleTableView(tables.SingleTableView):
@@ -80,13 +125,13 @@ class PermitTable(tables.Table):
     arrival_date = tables.DateColumn(format='d-M-Y')
 
     def render_color(self, value):
-        print("DEBUG: COlor=", value)
-        return format_html("<span style='display:block; background-color:%s'>%s</span>" % (value, value))
+        #print("DEBUG: COlor=", value)
+        return format_html("<span style='display:block; background-color:%s; font-size:0.8em; padding:8px;'>%s</span>" % (value, value))
 
     class Meta:
         model = Permit
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['color','aqis','qen','prefix','females','males', 'arrival_date','species','supplier','country','id']
+        fields = ['aqis','qen','color','prefix','females','males', 'arrival_date','species','supplier','country','id']
 
         order_by_field = 'arrival_date'
         sortable = True
@@ -117,23 +162,29 @@ class PermitReportTable(tables.Table):
 class OperationTable(tables.Table):
     frogid = tables.LinkColumn('frogs:frog_detail', accessor=A('frogid'), args=[A('pk')],verbose_name='Frog ID')
     num_operations = tables.Column(verbose_name="Num Ops", accessor=A('num_operations'), orderable=False)
-    last_operation = tables.DateColumn(verbose_name="Last Op", format='d-M-Y', accessor=A('last_operation'), orderable=False)
-   # next_operation = tables.DateColumn(verbose_name="Next Op not before", format='d-M-Y', accessor=A('next_operation'), orderable=False)
-    next_operation = tables.Column(verbose_name="Next Op", accessor=A('next_operation'), orderable=False)
+    last_operation = tables.DateColumn(verbose_name="Last Operation", format='d-M-Y', accessor=A('last_operation'), orderable=False)
+    next_operation = tables.Column(verbose_name="Next Op due", accessor=A('next_operation'), orderable=False)
 
     def render_next_operation(self, value):
-        #print('DEBUG: next_op=', value)
+        if not value:
+            return format_html('<span style="color:blue">Max ops</span>')
         delta = value - date.today()
-
         if delta.days == 0:
-            return format_html('<span style="color:green">Today</span>')
+            return format_html('<span style="color:green">OK</span>')
         elif delta.days < 1:
-            return format_html('<span style="color:blue">%s %s ago</span>' % (abs(delta.days),
+            return format_html('<span style="color:green">%s %s ago</span>' % (abs(delta.days),
                                    ("day" if abs(delta.days) == 1 else "days")))
         elif delta.days == 1:
             return format_html('<span style="color:red">Tomorrow</span>')
         elif delta.days > 1:
             return format_html('<span style="color:red">In %s days</span>' % delta.days)
+
+    def render_condition(self,value):
+        val = bool(value)
+        if val:
+            return format_html('<span style="color:red">&#10071</span>')
+        else:
+            return format_html('<span></span>')
 
     class Meta:
         model = Frog

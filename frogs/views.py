@@ -21,6 +21,7 @@ from django.conf import settings
 from datetime import date
 from ipware.ip import get_ip
 from axes.utils import reset
+from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
 from django.template import RequestContext
 try:
     import urlparse
@@ -269,25 +270,25 @@ class PermitAttachmentDelete(LoginRequiredMixin, generic.DeleteView):
         return reverse('frogs:permit_detail', args=[self.object.permitid.pk])
 
 
-def download(request, permitattachmentid):
-    f = PermitAttachment.objects.get(pk=permitattachmentid)
-    print("DEBUG: download=", f.docfile)
-    #f.write(p.body)
-    fname = os.path.basename(f.docfile.name)
-    print("DEBUG: filename=", fname)
-    docname = os.path.join(settings.MEDIA_ROOT, fname)
-    print("DEBUG: pathname=", docname)
-    print("DEBUG: file exists=", os.path.exists(docname))
-    size = os.path.getsize(docname)
-    print("DEBUG: file size=",size)
-    fw = FileWrapper(open(docname))
-    print("DEBUG: fw=", fw)
-    response = HttpResponse(fw, content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=%s' % fname
-    response['Content-Length'] = size
-    response['X-SendFile-Encoding: url'] = docname
-
-    return response
+# def download(request, permitattachmentid):
+#     f = PermitAttachment.objects.get(pk=permitattachmentid)
+#     print("DEBUG: download=", f.docfile)
+#     #f.write(p.body)
+#     fname = os.path.basename(f.docfile.name)
+#     print("DEBUG: filename=", fname)
+#     docname = os.path.join(settings.MEDIA_ROOT, fname)
+#     print("DEBUG: pathname=", docname)
+#     print("DEBUG: file exists=", os.path.exists(docname))
+#     size = os.path.getsize(docname)
+#     print("DEBUG: file size=",size)
+#     fw = FileWrapper(open(docname))
+#     print("DEBUG: fw=", fw)
+#     response = HttpResponse(fw, content_type='text/plain')
+#     response['Content-Disposition'] = 'attachment; filename=%s' % fname
+#     response['Content-Length'] = size
+#     response['X-SendFile-Encoding: url'] = docname
+#
+#     return response
 
 
 ############################################################################

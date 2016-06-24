@@ -72,10 +72,12 @@
                 <a class="btn btn-default" href="{% url 'frogs:frog_update' frog.id %}">Edit</a>
                 <a class="btn btn-default" href="{% url 'frogs:frog_upload' frog.id %}">Images</a>
                 {% if frog.gender == 'female' and frog.operation_set.count < site_config.max_ops %}
-                <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}">Operation</a>
+                <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}">Add Operation</a>
                 {% endif %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_death' frog.id %}">Death</a>
+                {% if frog.death.name != 'Alive' %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_disposal' frog.id %}">Disposal</a>
+                {% endif %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_delete' frog.id %}">Delete</a>
             </div>
         </div>
@@ -154,6 +156,7 @@
                     <th>Disposal action</th>
                     <th>Date</th>
                     <th>Run Number</th>
+                    <th>Comments</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -161,6 +164,7 @@
                     <td>Autoclaved</td>
                     <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
                     <td>{{frog.autoclave_run|force_escape}}</td>
+                    <td>{{frog.autoclave_comments|force_escape}}</td>
                 </tr>
                 <tr>
                     <td>Incinerated</td>

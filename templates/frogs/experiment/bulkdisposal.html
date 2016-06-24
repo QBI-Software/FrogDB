@@ -9,7 +9,9 @@
 
                 <fieldset data-role="controlgroup">
                     <legend>Batch disposal:</legend>
-
+                    <div align="right">
+                        <input type="checkbox" name="select_all" id="select_all" onChange='changeAll(this);'>Select All</input>
+                    </div>
                     {{ form.as_p }}
                 </fieldset>
 
@@ -25,4 +27,16 @@
 
         </div>
     </div>
-</div>{% endblock %}
+</div>
+<script type="text/javascript" >
+function changeAll(cb){
+
+  checkboxes = document.getElementsByName('expts');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = cb.checked;
+  }
+}
+
+</script>
+
+{% endblock %}

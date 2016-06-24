@@ -485,6 +485,7 @@ class SiteConfigurationForm(forms.ModelForm):
             'report_contact_details': CKEditorWidget(editor_options={'startupFocus': True}),
         }
 
+
 class SpeciesForm(forms.ModelForm):
     class Meta:
         model = Species

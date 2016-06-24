@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'django_filters',
     'axes',
     'captcha',
+    'django_cleanup',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -153,7 +154,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/deployment/
 STATIC_ROOT = os.path.join(BASE_DIR, 'frogs/static')
 STATIC_URL = '/static/'
-PDF_URL='/static/pdfjs/web/viewer.html?file='
+#PDF_URL='/static/pdfjs/web/viewer.html?file='
 MEDIA_URL = '/frogs/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'frogs/media')
 LOGIN_REDIRECT_URL ='/'
