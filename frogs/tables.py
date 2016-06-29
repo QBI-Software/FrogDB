@@ -102,7 +102,7 @@ class FrogTable(tables.Table):
         model = Frog
         attrs = {"class": "ui-responsive table table-hover"}
         fields = ['frogid','tankid','gender','species','current_location','condition','remarks','qen','death','get_disposed']
-        order_by_field = 'frogid'
+      #  order_by_field = 'frogid' #cannot sort with this on??
         sortable = False
 
 #Generic filtered table

@@ -313,13 +313,11 @@ class ReportTableView(LoginRequiredMixin, generic.TemplateView):
         species = self.kwargs.get('species')
         sp = Species.objects.get(name=species)
         config = SiteConfiguration.objects.get()
-        limit = 3 #config.notes_limit
+        limit = config.notes_limit
         notes_qs = Notes.objects.filter(notes_species__name=species).order_by('-note_date')[:limit]
-        #notes_table = NotesTable(notes_qs)
-        #RequestConfig(self.request, paginate={"per_page": limit}).configure(notes_table)
         locations = []
         for loc in Location.objects.all():
-            if (Frog.objects.filter(current_location=loc).count() > 0):
+            if (Frog.objects.filter(species__name=species).filter(current_location=loc).count() > 0):
                 locations.append(loc)
 
         context['species'] = species
@@ -328,7 +326,7 @@ class ReportTableView(LoginRequiredMixin, generic.TemplateView):
         context['table'] = table
         context['locations'] = locations
         context['genders'] =['female','male']
-        context['frogs_table']= Frog.objects.all().order_by('frogid')
+        context['frogs_table']= Frog.objects.filter(species__name=species).order_by('frogid')
         return context
 
     # def pdfview(self, request):
