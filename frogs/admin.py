@@ -17,7 +17,7 @@ class SiteConfigurationAdmin(SingletonModelAdmin):
     fieldsets = [
         ('Site', {'fields': ('site_name', 'maintenance_mode')}),
         ('Operations', {'fields': ('max_ops', 'op_interval')}),
-        ('Report', { 'fields': ('report_location','report_contact_details', 'aec',)})
+        ('Report', { 'fields': ('report_location','aec','report_contact_details', 'notes_limit')})
     ]
 
 
