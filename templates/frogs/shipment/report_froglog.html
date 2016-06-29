@@ -96,9 +96,6 @@
                         on {{frog.death_date|date:"d-M-Y"}}
                         {% if frog.autoclave_run %}
                         autoclaved (Run#{{frog.autoclave_run}})
-                        {% if frog.autoclave_comments %}
-                        &nbsp; {{frog.autoclave_comments}}
-                        {% endif %}
                         {% if frog.incineration_date %}
                         and incinerated
                         {% endif %}
