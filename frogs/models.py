@@ -36,6 +36,7 @@ class SiteConfiguration(SingletonModel):
     max_ops = models.SmallIntegerField(_("Max operations"), default=6)
     op_interval= models.SmallIntegerField(_("Operation interval (days)"), default=180)
     aec = models.CharField(_("AEC"), max_length=80, null=True, blank=True)
+    notes_limit = models.SmallIntegerField(_("Limit number of notes displayed"), default=8)
 
     def __unicode__(self):
         return u"Site Configuration"
@@ -191,7 +192,6 @@ class Frog(models.Model):
     disposed = models.BooleanField(_("Disposed"), default=False)
     autoclave_date = models.DateField("Autoclave Date", null=True, blank=True)
     autoclave_run = models.PositiveIntegerField(_("Autoclave Run"), default=0, null=True, blank=True)
-    autoclave_comments = models.CharField(_("Autoclave Comments"), max_length=200, null=True)
     incineration_date = models.DateField(_("Incineration Date"), null=True, blank=True)
 
     def __str__(self):
@@ -471,6 +471,9 @@ class Experiment(models.Model):
     waste_qty = models.PositiveSmallIntegerField(_("Waste quantity (L)"), blank=True, null=True)
     autoclave_indicator = models.BooleanField("Autoclave indicator", default=False)
     autoclave_complete = models.BooleanField("Autoclave complete", default=False)
+    autoclave_comments = models.CharField(_("Autoclave Comments"), max_length=200, null=True)
+    autoclave_run = models.PositiveIntegerField(_("Autoclave Run"), default=0, null=True, blank=True)
+    autoclave_machine = models.PositiveIntegerField(_("Autoclave Machine"), default=0, null=True, blank=True)
 
     def __str__(self):
         verbose = "Frog %s [op %d] expt %s (%d of %d ml)" % (

@@ -4,7 +4,7 @@
 <div class="container">
     <div class="page-header">
 
-        <span id="report-logo"><img src="{% static "frogs/img/logo.png" %}" align="left"  alt="QBI, The University of Queensland"/></span>
+        <span id="report-logo"><img src="{% static " frogs/img/logo.png" %}" align="left"  alt="QBI, The University of Queensland"/></span>
         <p class="report-header">Quarantine Sample Register<br/>Declared pest species - Log<br/>University of Queensland
         </p>
         <h2 class="report-title">{{ species }}</h2>
@@ -17,8 +17,9 @@
     <div class="panel panel-success">
         <div class="panel-heading"><h4 class="panel-title">Contacts</h4></div>
         <div class="panel-body">
-            
-            {{ site_config.report_contact_details|safe }}</div>
+
+            {{ site_config.report_contact_details|safe }}
+        </div>
     </div>
     <div class="well">
         {% if table %}
@@ -32,7 +33,26 @@
     {% if frognotes_table %}
     <div class="panel panel-info">
         <div class="panel-heading"><h3 class="panel-title">Frog Notes</h3></div>
-        <div class="panel-body">{% render_table frognotes_table %}</div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th>Initials</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for note in frognotes_table %}
+                <tr>
+                    <td>{{note.note_date|date:"d-M-Y"}}</td>
+                    <td>{{note.notes|force_escape}}</td>
+                    <td>{{note.initials|force_escape}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% endif %}
 
@@ -40,97 +60,97 @@
     <div class="panel panel-primary">
         <div class="panel-heading"><h2 class="panel-title">{{ loc.name|force_escape }}</h2></div>
 
-            {% for gender in genders %}
-            <div class="well"><h3 class="panel-title">{{ gender|capfirst }}</h3>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Frog ID</th>
-                        <th>Source</th>
-                        <th>Date of arrival</th>
-                        <th>QEN</th>
-                        <th>Gender</th>
-                        {% if 'Disposed' in loc.name %}
-                        <th>Disposal Method</th>
-                        <th>Disposal Date</th>
-                        {% endif %}
-                        {% if gender == 'female' %}
-                        <th>Operation Details</th>
-                        {% endif %}
-                    </tr>
-                    </thead>
-
-
-                    {% for frog in frogs_table %}
-                    {% if frog.gender == gender and frog.current_location == loc and frog.species.name == species %}
-                    <tbody>
-                    <tr style="background-color: {{frog.qen.color }}">
-                        <td><a href="{% url 'frogs:frog_detail' frog.pk %}">{{frog.frogid}}</a></td>
-                        <td>{{frog.qen.supplier.name}}</td>
-                        <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
-                        <td>{{frog.qen}}</td>
-                        <td>{{frog.gender}}</td>
-                        {% if 'Disposed' in loc.name %}
-                        <td>{{frog.death.name}}
-                            {% if frog.disposed %}
-                             on {{frog.death_date|date:"d-M-Y"}}
-                                {% if frog.autoclave_run  %}
-                                    autoclaved (Run#{{frog.autoclave_run}})
-                                    {% if frog.autoclave_comments %}
-                                       &nbsp; {{frog.autoclave_comments}}
-                                    {% endif %}
-                                    {% if frog.incineration_date %}
-                                        and incinerated
-                                    {% endif %}
-                                {% endif %}
-                            {% endif %}
-
-                        </td>
-                        <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
-                        {% endif %}
-                        {% if gender == 'female' %}
-                        <td>
-                            <table class="table-condensed">
-                                {% if frog.operation_set.count > 0 %}
-                                <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Initials</th>
-                                    <th>Op Date</th>
-
-                                </tr>
-                                </thead>
-                                {% endif %}
-                                <tbody>
-                                {% if gender == 'female' %}
-                                {% for op in frog.sorted_operation_set.all %}
-                                <tr>
-                                    <td>{{ op.opnum }}</td>
-                                    <td>{{ op.initials }}</td>
-                                    <td>{{ op.opdate|date:"d-M-Y" }}</td>
-
-                                </tr>
-                                {% empty %}
-                                <p>No operations performed</p>
-                                {% endfor %}
-                                {% endif %}
-                                </tbody>
-                            </table>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    </tbody>
+        {% for gender in genders %}
+        <div class="well"><h3 class="panel-title">{{ gender|capfirst }}</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Frog ID</th>
+                    <th>Source</th>
+                    <th>Date of arrival</th>
+                    <th>QEN</th>
+                    <th>Gender</th>
+                    {% if 'Disposed' in loc.name %}
+                    <th>Disposal Method</th>
+                    <th>Disposal Date</th>
                     {% endif %}
-                    {% endfor %}
-                </table>
-            </div>
-            {% empty %}
-            <p>No data available</p>
-            {% endfor %}
-</div>
-            {% empty %}
-            <p>No data available</p>
-            {% endfor %}
+                    {% if gender == 'female' %}
+                    <th>Operation Details</th>
+                    {% endif %}
+                </tr>
+                </thead>
+
+
+                {% for frog in frogs_table %}
+                {% if frog.gender == gender and frog.current_location == loc and frog.species.name == species %}
+                <tbody>
+                <tr style="background-color: {{frog.qen.color }}">
+                    <td><a href="{% url 'frogs:frog_detail' frog.pk %}">{{frog.frogid}}</a></td>
+                    <td>{{frog.qen.supplier.name}}</td>
+                    <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
+                    <td>{{frog.qen}}</td>
+                    <td>{{frog.gender}}</td>
+                    {% if 'Disposed' in loc.name %}
+                    <td>{{frog.death.name}}
+                        {% if frog.disposed %}
+                        on {{frog.death_date|date:"d-M-Y"}}
+                        {% if frog.autoclave_run %}
+                        autoclaved (Run#{{frog.autoclave_run}})
+                        {% if frog.autoclave_comments %}
+                        &nbsp; {{frog.autoclave_comments}}
+                        {% endif %}
+                        {% if frog.incineration_date %}
+                        and incinerated
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+
+                    </td>
+                    <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
+                    {% endif %}
+                    {% if gender == 'female' %}
+                    <td>
+                        <table class="table-condensed">
+                            {% if frog.operation_set.count > 0 %}
+                            <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Initials</th>
+                                <th>Op Date</th>
+
+                            </tr>
+                            </thead>
+                            {% endif %}
+                            <tbody>
+                            {% if gender == 'female' %}
+                            {% for op in frog.sorted_operation_set.all %}
+                            <tr>
+                                <td>{{ op.opnum }}</td>
+                                <td>{{ op.initials }}</td>
+                                <td>{{ op.opdate|date:"d-M-Y" }}</td>
+
+                            </tr>
+                            {% empty %}
+                            <p>No operations performed</p>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </td>
+                    {% endif %}
+                </tr>
+                </tbody>
+                {% endif %}
+                {% endfor %}
+            </table>
+        </div>
+        {% empty %}
+        <p>No data available</p>
+        {% endfor %}
+    </div>
+    {% empty %}
+    <p>No data available</p>
+    {% endfor %}
 
 
 </div>

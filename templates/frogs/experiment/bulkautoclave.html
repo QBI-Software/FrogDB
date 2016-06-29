@@ -15,11 +15,11 @@
 
 
                 <button type="submit" class="save btn btn-success">Save</button>
-                <a class="btn btn-default" href="{% url 'frogs:experiment_list_location' %}">Cancel</a>
+                <a class="btn btn-default" href="{% url 'frogs:disposal_list' %}">Cancel</a>
             </form>
             {% else %}
             <p>No samples ready for autoclave</p>
-            <a class="btn btn-default" href="{% url 'frogs:experiment_list_location' %}">Return</a>
+            <a class="btn btn-default" href="{% url 'frogs:disposal_list' %}">Return</a>
             {% endif %}
 
 

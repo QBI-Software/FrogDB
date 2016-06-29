@@ -75,6 +75,7 @@ class TransferTable(tables.Table):
         attrs = {"class": "ui-responsive table table-hover"}
         fields = ['frogid','species','qen','volume','transporter','method','transfer_date','transferapproval', 'sop','id']
 
+
 class FrogTable(tables.Table):
     #selectfrog = tables.CheckBoxColumn(accessor='pk')
     frogid = tables.LinkColumn('frogs:frog_detail', args=[A('pk')])
@@ -101,7 +102,7 @@ class FrogTable(tables.Table):
         model = Frog
         attrs = {"class": "ui-responsive table table-hover"}
         fields = ['frogid','tankid','gender','species','current_location','condition','remarks','qen','death','get_disposed']
-        #order_by_field = 'frogid'
+        order_by_field = 'frogid'
         sortable = False
 
 #Generic filtered table

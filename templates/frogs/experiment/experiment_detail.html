@@ -4,6 +4,7 @@
     </div>
     <div class="col-md-6">
         <div class="well">
+            <h2>Frog</h2>
             <table id="view-table" class="ui-responsive table table-hover">
                 <tbody>
                 <tr>
@@ -22,81 +23,84 @@
             <table id="expt-table" data-role="table" class="ui-responsive table table-hover">
                 <thead>
                     <tr>
+                        <th>Experiment Location</th>
                         <th>Experiment From</th>
                         <th>Experiment To</th>
-                        <th>Experiment Location</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td>{{expt.location|force_escape}}</td>
                         <td>{{expt.expt_from|date:"d-M-Y"}}</td>
                         <td>{{expt.expt_to|date:"d-M-Y"}}</td>
-                        <td>{{expt.location}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <div data-role="collapsible" class="well">
             <h2>Oocytes transfer</h2>
-            <table id="ooctye-table" data-role="table" class="ui-responsive table table-hover">
-                <thead>
-                    <tr>
-                        <th>Volume received (ml)</th>
-                        <th>Volume transferred (ml)</th>
-                        <th>Volume used (ml)</th>
-                    </tr>
-                </thead>
+            <table id="ooctye-table" data-role="table" class="ui-responsive table">
                 <tbody>
                     <tr>
+                        <th>Volume received (ml)</th>
                         <td>{{expt.received|force_escape}}</td>
-                        <td>{{expt.transferred|force_escape}}</td>
-                        <td>{{expt.used|force_escape}}</td>
+                    </tr>
+                        <tr>
+                            <th>Volume transferred (ml)</th>
+                            <td>{{expt.transferred|force_escape}}</td>
+                        </tr>
+                        <tr>
+                            <th>Volume used (ml)</th>
+                            <td>{{expt.used|force_escape}}</td>
                     </tr>
                 </tbody>
+
             </table>
         </div>
 
         <div data-role="collapsible" class="well">
             <h2>Disposal</h2>
-            <table id="disposal-table" data-role="table" class="ui-responsive table table-hover">
-                <thead>
-                    <tr>
-                        <th>Disposed of</th>
-                        <th>Disposal sent by</th>
-                        <th>Disposal date</th>
-                        <th>Waste type</th>
-                        <th>Waste content</th>
-                        <th>Waste quantity</th>
-                    </tr>
-                </thead>
+            <table id="disposal-table" data-role="table" class="ui-responsive table">
                 <tbody>
-                    <tr>
-                        <td>{{expt.expt_disposed}}</td>
-                        <td>{{expt.disposal_sentby}}</td>
-                        <td>{{expt.disposal_date|date:"d-M-Y"}}</td>
-                        <td>{{expt.waste_type}}</td>
-                        <td>{{expt.waste_content}}</td>
-                        <td>{{expt.waste_qty}}</td>
-                    </tr>
+
+                        <tr><th>Disposed of</th>
+                        <td>{{expt.expt_disposed|yesno:"Yes, No, NA"}}</td></tr>
+                        <tr><th>Disposal sent by</th>
+                        <td>{{expt.disposal_sentby|force_escape}}</td></tr>
+                        <tr><th>Disposal date</th>
+                        <td>{{expt.disposal_date|date:"d-M-Y"}}</td></tr>
+                        <tr><th>Waste type</th>
+                        <td>{{expt.waste_type|force_escape}}</td></tr>
+                        <tr><th>Waste content</th>
+                        <td>{{expt.waste_content|force_escape}}</td></tr>
+                        <tr><th>Waste quantity (L)</th>
+                        <td>{{expt.waste_qty|force_escape}}</td></tr>
+
                 </tbody>
+
             </table>
         </div>
 
         <div data-role="collapsible" class="well">
             <h2>Autoclave</h2>
             <table id="autoclave-table" data-role="table" class="ui-responsive table table-hover">
-                <thead>
-                    <tr>
-                        <th>Autoclave indicator</th>
-                        <th>Autoclave complete</th>
-                    </tr>
-                </thead>
                 <tbody>
-                    <tr>
-                        <td>{{expt.autoclave_indicator}}</td>
-                        <td>{{expt.autoclave_complete}}</td>
-                    </tr>
+
+                    <tr><th>Autoclave indicator</th>
+                    <td>{{expt.autoclave_indicator|yesno:"Yes, No, NA"}}</td></tr>
+                    <tr><th>Autoclave complete</th>
+                    <td>{{expt.autoclave_complete|yesno:"Yes, No, NA"}}</td></tr>
+                    <tr><th>Autoclave date</th>
+                    <td>{{expt.autoclave_date|date:"d-M-Y"}}</td></tr>
+                    <tr><th>Autoclave machine</th>
+                    <td>{{expt.autoclave_machine|force_escape}}</td></tr>
+                    <tr><th>Autoclave run</th>
+                    <td>{{expt.autoclave_run|force_escape}}</td></tr>
+                    <tr><th>Autoclave comments</th>
+                    <td>{{expt.autoclave_comments|force_escape}}</td></tr>
                 </tbody>
+
             </table>
         </div>
     </div>

@@ -312,14 +312,21 @@ class ReportTableView(LoginRequiredMixin, generic.TemplateView):
         RequestConfig(self.request).configure(table)
         species = self.kwargs.get('species')
         sp = Species.objects.get(name=species)
-        notes_table = NotesTable(Notes.objects.filter(notes_species__name=species).order_by('-note_date'))
-        RequestConfig(self.request).configure(notes_table)
+        config = SiteConfiguration.objects.get()
+        limit = 3 #config.notes_limit
+        notes_qs = Notes.objects.filter(notes_species__name=species).order_by('-note_date')[:limit]
+        #notes_table = NotesTable(notes_qs)
+        #RequestConfig(self.request, paginate={"per_page": limit}).configure(notes_table)
+        locations = []
+        for loc in Location.objects.all():
+            if (Frog.objects.filter(current_location=loc).count() > 0):
+                locations.append(loc)
 
         context['species'] = species
-        context['frognotes_table'] = notes_table
+        context['frognotes_table'] = notes_qs
         context['generalnotes'] = sp.generalnotes
         context['table'] = table
-        context['locations'] = Location.objects.all()
+        context['locations'] = locations
         context['genders'] =['female','male']
         context['frogs_table']= Frog.objects.all().order_by('frogid')
         return context
@@ -1039,6 +1046,9 @@ class BulkAutoclave(LoginRequiredMixin, generic.FormView):
             expt = pk  # Frog.objects.get(pk=pk)
             expt.autoclave_indicator = form.cleaned_data['autoclave_indicator']
             expt.autoclave_complete = form.cleaned_data['autoclave_complete']
+            expt.autoclave_machine = form.cleaned_data['autoclave_machine']
+            expt.autoclave_run = form.cleaned_data['autoclave_run']
+            expt.autoclave_comments = form.cleaned_data['autoclave_comments']
             #print('Updated:Expt=', expt.id)
             expt.save()
 
