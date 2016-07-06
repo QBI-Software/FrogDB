@@ -27,9 +27,9 @@
                 {% else %}
                 <p>There are no shipments.</p>
                 {% endif %}
-                {% if user.is_authenticated %}
-                <p><a href="{% url 'frogs:permit_create' %}" class="btn btn-success">Create Shipment</a>
-                </p>
+                {% if user.is_authenticated and perms.frogs.can_add_permit %}
+                    <p><a href="{% url 'frogs:permit_create' %}" class="btn btn-success">Create Shipment</a>
+                    </p>
                 {% endif %}
             </div>
         </div>

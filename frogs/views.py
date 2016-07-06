@@ -28,14 +28,14 @@ try:
 except ImportError:
     from urllib import parse as urlparse # python3 support
 ### Local imports ###############################################################################
-from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration, Qap, PermitAttachment
-from .forms import PermitForm, FrogForm, FrogDeathForm, FrogDisposalForm, OperationForm, TransferForm, ExperimentForm, FrogAttachmentForm, BulkFrogForm, BulkFrogDeleteForm, ExperimentDisposalForm, ExperimentAutoclaveForm, BulkFrogDisposalForm, BulkExptDisposalForm, NotesForm, AxesCaptchaForm, BulkExptAutoclaveForm, PermitAttachmentForm
-from .tables import ExperimentTable,PermitTable,FrogTable,TransferTable, OperationTable,DisposalTable, FilteredSingleTableView, NotesTable, PermitReportTable
+from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, Location, Species, Deathtype, SiteConfiguration, Qap, PermitAttachment, Document
+from .forms import PermitForm, FrogForm, FrogDeathForm, FrogDisposalForm, OperationForm, TransferForm, ExperimentForm, FrogAttachmentForm, BulkFrogForm, BulkFrogDeleteForm, ExperimentDisposalForm, ExperimentAutoclaveForm, BulkFrogDisposalForm, BulkExptDisposalForm, NotesForm, AxesCaptchaForm, BulkExptAutoclaveForm, PermitAttachmentForm, DocumentForm
+from .tables import ExperimentTable,PermitTable,FrogTable,TransferTable, OperationTable,DisposalTable, FilteredSingleTableView, NotesTable, PermitReportTable, DocumentTable
 from .filters import FrogFilter, PermitFilter, TransferFilter, ExperimentFilter, OperationFilter
 ###AUTHORIZATION CLASS ##########################################################################
 #from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 # import the logging library
 import logging
 
@@ -225,33 +225,37 @@ class PermitFilterView(FilteredSingleTableView):
     table_class = PermitTable
     filter_class = PermitFilter
 
-class PermitCreate(LoginRequiredMixin, generic.CreateView):
+class PermitCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Permit
     template_name = 'frogs/shipment/shipment_create.html'
     form_class = PermitForm
     raise_exception = True
     success_url = reverse_lazy('frogs:permit_list')
+    permission_required = 'frogs.permit.can_add_permit'
 
-class PermitUpdate(LoginRequiredMixin, generic.UpdateView):
+class PermitUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Permit
     form_class = PermitForm
     template_name = 'frogs/shipment/shipment_create.html'
     success_url = reverse_lazy('frogs:permit_list')
     raise_exception = True
+    permission_required = 'frogs.permit.can_change_permit'
 
-class PermitDelete(LoginRequiredMixin, generic.DeleteView):
+class PermitDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Permit
     success_url = reverse_lazy("frogs:permit_list")
     raise_exception = True
     template_name = 'frogs/shipment/permit_confirm_delete.html'
+    permission_required = 'frogs.permit.can_delete_permit'
 
-class PermitAttachmentView(LoginRequiredMixin, generic.CreateView):
+
+class PermitAttachmentView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = PermitAttachment
     form_class = PermitAttachmentForm
     context_object_name = 'permit'
     template_name = 'frogs/shipment/shipment_upload.html'
     raise_exception = True
-
+    permission_required = 'frogs.permit_attachment.can_add_permit_attachment'
 
     def get_success_url(self):
         return reverse('frogs:permit_detail', args=[self.object.permitid.pk])
@@ -261,10 +265,11 @@ class PermitAttachmentView(LoginRequiredMixin, generic.CreateView):
         permit = Permit.objects.get(pk=fid)
         return {'permitid': permit}
 
-class PermitAttachmentDelete(LoginRequiredMixin, generic.DeleteView):
+class PermitAttachmentDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = PermitAttachment
     raise_exception = True
     template_name = 'frogs/shipment/permitattachment_confirm_delete.html'
+    permission_required = 'frogs.permit_attachment.can_delete_permit_attachment'
 
     def get_success_url(self):
         return reverse('frogs:permit_detail', args=[self.object.permitid.pk])
@@ -379,11 +384,12 @@ class FrogDetail(LoginRequiredMixin, generic.DetailView):
     template_name = 'frogs/frog/frog_view.html'
     raise_exception = True
 
-class FrogCreate(LoginRequiredMixin, generic.CreateView):
+class FrogCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Frog
     template_name = 'frogs/frog/frog_create.html'
     form_class = FrogForm
     raise_exception = True
+    permission_required = 'frogs.frog.can_add_frog'
 
     def form_valid(self, form):
         try:
@@ -397,48 +403,52 @@ class FrogCreate(LoginRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
 
-class FrogUpdate(LoginRequiredMixin, generic.UpdateView):
+class FrogUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Frog
     form_class = FrogForm
     template_name = 'frogs/frog/frog_create.html'
     raise_exception = True
+    permission_required = 'frogs.frog.can_change_frog'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
 
-class FrogDelete(LoginRequiredMixin, generic.DeleteView):
+class FrogDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Frog
     success_url = reverse_lazy("frogs:frog_list")
     template_name = 'frogs/frog/frog_confirm_delete.html'
     raise_exception = True
+    permission_required = 'frogs.frog.can_delete_frog'
 
-class FrogDeath(LoginRequiredMixin, generic.UpdateView):
+class FrogDeath(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Frog
     form_class = FrogDeathForm
     context_object_name = 'frog'
     template_name = 'frogs/frog/frog_death.html'
     raise_exception = True
+    permission_required = 'frogs.frog.can_change_frog'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
 
-class FrogDisposal(LoginRequiredMixin, generic.UpdateView):
+class FrogDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Frog
     form_class = FrogDisposalForm
     context_object_name = 'frog'
     template_name = 'frogs/frog/frog_disposal.html'
     raise_exception = True
+    permission_required = 'frogs.frog.can_change_frog'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
 
-class FrogAttachment(LoginRequiredMixin, generic.CreateView):
+class FrogAttachment(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = FrogAttachment
     form_class = FrogAttachmentForm
     context_object_name = 'frog'
     template_name = 'frogs/frog/frog_upload.html'
     raise_exception = True
-
+    permission_required = 'frogs.frog_attachment.can_add_frog_attachment'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.frogid.pk])
@@ -448,13 +458,14 @@ class FrogAttachment(LoginRequiredMixin, generic.CreateView):
         frog = Frog.objects.get(pk=fid)
         return {'frogid': frog}
 
-class FrogBulkCreate(LoginRequiredMixin, generic.FormView):
+class FrogBulkCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
     model = Frog
     form_class = BulkFrogForm
     template_name = "frogs/frog/bulkfrog_create.html"
     success_url = reverse_lazy("frogs:frog_list")
     fid = None
     raise_exception = True
+    permission_required = 'frogs.frog.can_add_frog'
 
     def form_valid(self, form):
         #Get shipment: number female/male
@@ -515,10 +526,11 @@ class FrogBulkCreate(LoginRequiredMixin, generic.FormView):
 
 
 #Delete frogs from a shipment
-class FrogBulkDelete(LoginRequiredMixin, generic.FormView):
+class FrogBulkDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
     template_name = 'frogs/frog/bulkfrog_confirm_delete.html'
     form_class=BulkFrogDeleteForm
     raise_exception = True
+    permission_required = 'frogs.frog.can_delete_frog'
 
 
     def post(self, request, *args, **kwargs):
@@ -554,11 +566,12 @@ class FrogBulkDelete(LoginRequiredMixin, generic.FormView):
         return reverse('frogs:frog_list')
 
 # Bulk entry for disposal of frogs
-class FrogBulkDisposal(LoginRequiredMixin, generic.FormView):
+class FrogBulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
     template_name = 'frogs/frog/frog_bulkdisposal.html'
     form_class = BulkFrogDisposalForm
     model = Frog
     raise_exception = True
+    permission_required = 'frogs.frog.can_change_frog'
 
     def form_valid(self, form):
         bulkfrogs = form.cleaned_data['frogs']
@@ -594,27 +607,31 @@ class OperationFilterView(LoginRequiredMixin, FilteredSingleTableView):
     raise_exception = True
 
     def get_context_data(self, **kwargs):
+        spp = self.kwargs.get('sp')
+        if (spp is None):
+            spp = 'all'
+        #print("DEBUG: sp=", spp)
         context = super(OperationFilterView, self).get_context_data(**kwargs)
-        ops = Operation.objects.all().values_list('frogid')
+        spnames={'all':'All'}
+        #ALL
         qs = Frog.objects.filter(gender='female') \
-            .filter(death_date__isnull=True).order_by('pk')
-            # .filter(id__in=ops)
+            .filter(death__name='Alive').order_by('frogid')
 
-        table = OperationTable(qs, prefix='1-')
+        #SPP
+        frogspecies = Species.objects.values_list('name', flat=True)
+        for s in frogspecies:
+            spnames[s.split('.')[1]]= s
+
+        fsp = "X.%s" % spp
+        if (fsp in frogspecies):
+            qs = qs.filter(species__name=fsp)
+
+        table = OperationTable(qs)
         RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
-        frogspecies = Species.objects.all()
-        speciestables={}
-        num = 1
-        for sp in frogspecies:
-            num = num+1
-            pfx = '%d-' % num
-            t1 = OperationTable(qs.filter(species=sp), prefix=pfx)
-            RequestConfig(self.request, paginate={"per_page": 20}).configure(t1)
-            speciestables[sp.name.split('.')[1]] = t1
 
-        context['species'] = self.kwargs.get('species')
+        context['species'] = spp
         context['summaries'] = table
-        context['summaries_sp'] = speciestables
+        context['splist'] = sorted(spnames.items()) #speciestables
         return context
 
 
@@ -688,11 +705,12 @@ class OperationStatsView(LoginRequiredMixin, generic.TemplateView):
 
 ## 1. Set frogid then 2. Increment opnum
 ## Limits: 6 operations and 6 mths apart - in Model
-class OperationCreate(LoginRequiredMixin, generic.CreateView):
+class OperationCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Operation
     template_name = 'frogs/operation/operation_create.html'
     form_class = OperationForm
     raise_exception = True
+    permission_required = 'frogs.operation.can_add_operation'
 
     def get_success_url(self):
         frog = Frog.objects.filter(frogid=self.object.frogid)
@@ -709,11 +727,12 @@ class OperationCreate(LoginRequiredMixin, generic.CreateView):
         return {'frogid': frog, 'opnum': opnum}
 
 
-class OperationUpdate(LoginRequiredMixin, generic.UpdateView):
+class OperationUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Operation
     form_class = OperationForm
     template_name = 'frogs/operation/operation_create.html'
     raise_exception = True
+    permission_required = 'frogs.operation.can_change_operation'
 
     def get_success_url(self):
         frogid = self.object.frogid
@@ -722,10 +741,11 @@ class OperationUpdate(LoginRequiredMixin, generic.UpdateView):
         return reverse('frogs:frog_detail', args=[fid])
 
 
-class OperationDelete(LoginRequiredMixin, generic.DeleteView):
+class OperationDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Operation
     template_name = 'frogs/operation/operation_confirm_delete.html'
     raise_exception = True
+    permission_required = 'frogs.operation.can_delete_operation'
 
     def get_success_url(self):
         frog = Frog.objects.filter(frogid=self.object.frogid)
@@ -772,11 +792,12 @@ class TransferDetail(LoginRequiredMixin, generic.DetailView):
         context = super(TransferDetail, self).get_context_data(**kwargs)
         return context
 
-class TransferCreate(LoginRequiredMixin, generic.CreateView):
+class TransferCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Transfer
     template_name = 'frogs/transfer/transfer_create.html'
     form_class = TransferForm
     raise_exception = True
+    permission_required = 'frogs.transfer.can_add_transfer'
 
     def get_initial(self):
         opid = self.kwargs.get('operationid')
@@ -786,20 +807,22 @@ class TransferCreate(LoginRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse('frogs:transfer_detail', args=[self.object.id])
 
-class TransferUpdate(LoginRequiredMixin, generic.UpdateView):
+class TransferUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Transfer
     form_class = TransferForm
     template_name = 'frogs/transfer/transfer_create.html'
     raise_exception = True
+    permission_required = 'frogs.transfer.can_change_transfer'
 
     def get_success_url(self):
         return reverse('frogs:transfer_detail', args=[self.object.id])
 
-class TransferDelete(LoginRequiredMixin, generic.DeleteView):
+class TransferDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Transfer
     template_name = 'frogs/transfer/transfer_confirm_delete.html'
     success_url = reverse_lazy("frogs:transfer_list")
     raise_exception = True
+    permission_required = 'frogs.transfer.can_delete_transfer'
 
 ########## EXPERIMENTS ############################################
 class ExperimentList(LoginRequiredMixin, generic.ListView):
@@ -841,31 +864,29 @@ class ExperimentTracking(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         table = Experiment.objects.order_by('-transferid')
-        #table = DisposalTable(Experiment.objects.order_by('disposal_date'))
-        #RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         return table
     
     def get_context_data(self, **kwargs):
+        loc = self.kwargs.get('loc')
+        if (loc is None):
+            loc = 'aaall' #ensure comes first
         context = super(ExperimentTracking, self).get_context_data(**kwargs)
         qs = self.get_queryset()
-        config = RequestConfig(self.request, paginate={"per_page": 20})
-        tablelist ={}
-        num = 1
+
         qaps = Qap.objects.values_list('building', flat=True).order_by('building')
-        buildings =['All']
+        buildings ={'aaall': 'All'}
         for q in qaps:
-            buildings.append(q)
-        for bld in buildings:
-            pfx = '%d-' % num
-            if (bld == 'All'):        
-                table = ExperimentTable(qs, prefix=pfx)
-            else:
-                table = ExperimentTable(qs.filter(expt_location__building=bld), prefix=pfx)
-            config.configure(table)
-            tablelist[bld] = table
-            num = num+1
-        
-        context['tablelist'] =tablelist
+            buildings[q.lower()] = q
+        #print("DEBUG: loc=", loc)
+        #print("DEBUG: buildings=", buildings)
+        #print("DEBUG: qaps=", qaps)
+        if (loc.upper() in qaps):
+            qs = qs.filter(expt_location__building=loc.upper())
+        table = ExperimentTable(qs)
+        RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
+        context['location'] = loc
+        context['loclist'] = sorted(buildings.items())
+        context['expts'] = table
         return context
 
 
@@ -879,11 +900,12 @@ class ExperimentDetail(LoginRequiredMixin, generic.DetailView):
         context = super(ExperimentDetail, self).get_context_data(**kwargs)
         return context
 
-class ExperimentCreate(LoginRequiredMixin, generic.CreateView):
+class ExperimentCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Experiment
     template_name = 'frogs/experiment/experiment_create.html'
     form_class = ExperimentForm
     raise_exception = True
+    permission_required = 'frogs.experiment.can_add_experiment'
 
     def get_initial(self):
         opid = self.kwargs.get('transferid')
@@ -894,37 +916,41 @@ class ExperimentCreate(LoginRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
 
-class ExperimentUpdate(LoginRequiredMixin, generic.UpdateView):
+class ExperimentUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Experiment
     form_class = ExperimentForm
     template_name = 'frogs/experiment/experiment_create.html'
     raise_exception = True
+    permission_required = 'frogs.experiment.can_change_experiment'
 
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
 
-class ExperimentDelete(LoginRequiredMixin, generic.DeleteView):
+class ExperimentDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Experiment
     success_url = reverse_lazy("frogs:experiment_list")
     raise_exception = True
+    permission_required = 'frogs.experiment.can_delete_experiment'
 
-class ExperimentDisposal(LoginRequiredMixin, generic.UpdateView):
+class ExperimentDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Experiment
     form_class = ExperimentDisposalForm
     context_object_name = 'experiment'
     template_name = 'frogs/experiment/experiment_create.html'
     raise_exception = True
+    permission_required = 'frogs.experiment.can_change_experiment'
 
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
 
 
-class ExperimentAutoclave(LoginRequiredMixin, generic.UpdateView):
+class ExperimentAutoclave(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Experiment
     form_class = ExperimentAutoclaveForm
     context_object_name = 'experiment'
     template_name = 'frogs/experiment/experiment_create.html'
     raise_exception = True
+    permission_required = 'frogs.experiment.can_change_experiment'
 
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
@@ -941,35 +967,33 @@ class DisposalList(LoginRequiredMixin, generic.ListView):
         return table
     
     def get_context_data(self, **kwargs):
+        loc = self.kwargs.get('location')
+        if (loc is None):
+            loc = 'aaall'  # ensure comes first
         context = super(DisposalList, self).get_context_data(**kwargs)
         qs = self.get_queryset()
-        config = RequestConfig(self.request, paginate={"per_page": 20})
-        tablelist ={}
-        num = 1
         qaps = Qap.objects.values_list('building', flat=True).order_by('building')
-        buildings = ['All']
+        buildings = {'aaall': 'All'}
         for q in qaps:
-            buildings.append(q)
-       # buildings =['All','QBI','IMB'] #Hard coded but could read from config list
-        for bld in sorted(buildings):
-            pfx = '%d-' % num
-            if (bld == 'All'):        
-                table = DisposalTable(qs, prefix=pfx)
-            else:
-                table = DisposalTable(qs.filter(expt_location__building=bld), prefix=pfx)
-            config.configure(table)
-            tablelist[bld] = table
-            num = num+1
-        
-        context['tablelist'] =tablelist
+            buildings[q.lower()] = q
+        if (loc.upper() in qaps):
+            qs = qs.filter(expt_location__building=loc.upper())
+        table = DisposalTable(qs)
+        RequestConfig(self.request, paginate={"per_page": 2}).configure(table)
+        context['location'] = loc
+        context['loclist'] = sorted(buildings.items())
+        context['expts'] = table
+       # context['tablelist'] =tablelist
         return context
 
-class BulkDisposal(LoginRequiredMixin, generic.FormView):
+
+class BulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
     template_name = 'frogs/experiment/bulkdisposal.html'
     form_class = BulkExptDisposalForm
     model = Experiment
     raise_exception = True
     location = 'All'
+    permission_required = 'frogs.experiment.can_change_experiment'
 
     def get_form_kwargs(self, **kwargs):
         #print("DEBUG:getformkwargs:", kwargs)
@@ -1016,12 +1040,13 @@ class BulkDisposal(LoginRequiredMixin, generic.FormView):
         return reverse('frogs:experiment_list_location')
 
 
-class BulkAutoclave(LoginRequiredMixin, generic.FormView):
+class BulkAutoclave(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
     template_name = 'frogs/experiment/bulkautoclave.html'
     location = 'All'
     form_class = BulkExptAutoclaveForm
     model = Experiment
     raise_exception = True
+    permission_required = 'frogs.experiment.can_change_experiment'
 
     def get_form_kwargs(self, **kwargs):
         #print("DEBUG:getformkwargs:", kwargs)
@@ -1064,7 +1089,7 @@ class NotesList(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         table = NotesTable(Notes.objects.order_by('-note_date'))
-        RequestConfig(self.request, paginate={"per_page": 10}).configure(table)
+        RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         return table
 
 class NotesDetail(LoginRequiredMixin, generic.DetailView):
@@ -1078,22 +1103,69 @@ class NotesDetail(LoginRequiredMixin, generic.DetailView):
 #     table_class = NotesTable
 #     filter_class = NotesFilter
 
-class NotesCreate(LoginRequiredMixin, generic.CreateView):
+class NotesCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Notes
     template_name = 'frogs/notes/notes_create.html'
     form_class = NotesForm
     success_url = reverse_lazy('frogs:notes_list')
     raise_exception = True
+    permission_required = 'frogs.notes.can_add_notes'
 
-class NotesUpdate(LoginRequiredMixin, generic.UpdateView):
+class NotesUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Notes
     form_class = NotesForm
     template_name = 'frogs/notes/notes_create.html'
     success_url = reverse_lazy('frogs:notes_list')
     raise_exception = True
+    permission_required = 'frogs.notes.can_change_notes'
 
-class NotesDelete(LoginRequiredMixin, generic.DeleteView):
+class NotesDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Notes
     success_url = reverse_lazy("frogs:notes_list")
     template_name = 'frogs/notes/notes_confirm_delete.html'
     raise_exception = True
+    permission_required = 'frogs.notes.can_delete_notes'
+
+# DOCUMENTS
+class DocumentList(LoginRequiredMixin, generic.ListView):
+    template_name = 'frogs/document/document_list.html'
+    context_object_name = 'docs_list'
+    raise_exception = True
+
+    def get_queryset(self):
+        table = DocumentTable(Document.objects.order_by('pk'))
+        RequestConfig(self.request, paginate={"per_page": 10}).configure(table)
+        return table
+
+class DocumentDetail(LoginRequiredMixin, generic.DetailView):
+    model = Document
+    context_object_name = 'document'
+    template_name = 'frogs/document/document_view.html'
+    raise_exception = True
+
+class DocumentCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    model = Document
+    template_name = 'frogs/document/document_create.html'
+    form_class = DocumentForm
+    success_url = reverse_lazy('frogs:documents_list')
+    raise_exception = True
+    permission_required = 'frogs.document.can_add_document'
+
+    def get_success_url(self):
+        return reverse('frogs:documents_detail', args=[self.object.pk])
+
+
+class DocumentUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    model = Document
+    form_class = DocumentForm
+    template_name = 'frogs/document/document_create.html'
+    success_url = reverse_lazy('frogs:documents_list')
+    raise_exception = True
+    permission_required = 'frogs.document.can_change_document'
+
+class DocumentDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+    model = Document
+    success_url = reverse_lazy("frogs:documents_list")
+    template_name = 'frogs/document/document_confirm_delete.html'
+    raise_exception = True
+    permission_required = 'frogs.document.can_delete_document'

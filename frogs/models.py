@@ -499,3 +499,25 @@ class Notes(models.Model):
 
     def initials(self):
         return get_initials_from_user(self.notes_by)
+
+class Document(models.Model):
+    docfile = models.FileField(verbose_name="Document")
+    description = models.CharField(_("Description"), max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        #return os.path.basename(self.docfile.name)
+        return self.docfile.name[2:]
+
+    def getextension(self):
+        ext = os.path.splitext(self.docfile.name)[1]  # [0] returns path+filename
+        print("DEBUG:ext=", ext)
+        return ext
+
+    def clean(self):
+        ext = self.getextension()
+        valid_extensions = ['.pdf', '.doc', '.docx', '.txt']
+        if not ext.lower() in valid_extensions:
+            raise ValidationError(u'Unsupported file type (only pdf, doc, txt).')
+
+    def docfile_delete(**kwargs):
+        print("DEBUG:Called docfile_delete:", kwargs)

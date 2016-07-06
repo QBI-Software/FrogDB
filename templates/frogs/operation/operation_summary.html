@@ -6,33 +6,24 @@
     <div class="page-header"><h2>State of Operations as at {% now "d-M-Y" %}</h2></div>
      <p><a href="{% url 'frogs:operation_stats' %}" class="btn btn-info">Statistics</a></p>
      <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="{% url 'frogs:operation_summary' %}#all">All</a></li>
-
-    {% for sp, sptable in summaries_sp.items %}
-        <li><a data-toggle="tab" href="{% url 'frogs:operation_summary' %}#{{sp}}">X.{{sp}}</a></li>
-    {% endfor %}
+         {% for sp,value in splist %}
+             {% if sp == species %}
+             <li class="active">
+             {% else %}
+            <li>
+             {% endif %}
+             <a  href="{% url 'frogs:operation_summary' sp %}">{{value}}</a></li>
+        {% endfor %}
        
     </ul>
     <div class="tab-content">
-    <div id="all" class="tab-pane fade in active">
-        {% if summaries %}
+    <div id="{{species}}" class="tab-pane fade in active">
+        {% if summaries.rows %}
             {% render_table summaries %}
         {% else %}
-            <div class="alert alert-success"><p>No operations in database</p></div>
+            <div class="alert alert-warning"><p>No operations in database</p></div>
         {% endif %}
     </div>
-    
-    {% for sp, sptable in summaries_sp.items %}
-        <div id="{{sp}}" class="tab-pane fade">
-        {% if sptable %}
-            {% render_table sptable %}
-        {% else %}
-            <div class="alert alert-success"><p>No X.{{sp}} operations in database</p></div>
-        {% endif %}
     </div>
 
-    {% endfor %}
-
-
-        </div>
 </div>{% endblock %}

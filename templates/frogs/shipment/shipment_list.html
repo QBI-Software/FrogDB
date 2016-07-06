@@ -3,7 +3,9 @@
 {% block content %}{% load render_table from django_tables2 %}
 <div class="container">
 <div class="page-header"><h2>Shipments</h2></div>
+    {% if perms.frogs.can_add_permit %}
 <p><a href="{% url 'frogs:permit_create' %}" class="btn btn-info">Create New Shipment</a></p>
+    {% endif %}
 {% if shipment_list %}
     {% render_table shipment_list %}
 {% endif %}

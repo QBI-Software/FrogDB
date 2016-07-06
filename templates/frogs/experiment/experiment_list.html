@@ -5,34 +5,31 @@
 {% block content %}
 <div class="container">
     <div class="page-header"><h2>Ooctye Tracking Records (Experiments)</h2></div>
+
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="{% url 'frogs:experiment_list' %}#all">All</a></li>
-    {% for t, expt_list in tablelist.items %}
-        {% if t != 'All' %}
-            <li><a data-toggle="tab" href="{% url 'frogs:experiment_list' %}#{{t.lower}}">{{t}}</a></li>
-        {% endif %}
-        
-    {% endfor %}
+        {% for t, val in loclist %}
+             {% if t == location %}
+             <li class="active">
+             {% else %}
+            <li>
+             {% endif %}
+             <a  href="{% url 'frogs:experiment_list_location' t %}">{{val}}</a></li>
+        {% endfor %}
+
     </ul>
     <div class="tab-content">
-
-        {% for t, expt_list in tablelist.items %}
-            {% if t != 'All' %}
-            <div id="{{ t.lower }}" class="tab-pane fade in">
-            {% else %}
-            <div id="{{ t.lower }}" class="tab-pane fade in active">
-            {% endif %}
-            {% if expt_list %}
-            <div class="well-sm" align="right">
-                <a href="{% url 'frogs:expt_bulkdisposal' t.lower %}" class="btn btn-success">Bulk Dispose Waste</a>
+    <div id="{{location}}" class="tab-pane fade in active">
+        {% if expts.rows %}
+             <div class="well-sm" align="right">
+                <a href="{% url 'frogs:expt_bulkdisposal' location %}" class="btn btn-success">Bulk Dispose Waste</a>
             </div>
-                {% render_table expt_list %}
-            {% else %}
-            <div class="alert alert-success"><p>No experiments in database</p></div>
-            {% endif %}
-        </div>
-        {% endfor %}
-    
+            {% render_table expts %}
+        {% else %}
+            <div class="alert alert-warning"><p>No experiments in database</p></div>
+        {% endif %}
     </div>
+    </div>
+
+
 </div>
 {% endblock %}

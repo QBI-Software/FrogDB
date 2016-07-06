@@ -14,8 +14,8 @@
     <form method="POST" role="form" class="post-form ui-responsive">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-        <button type="button" class="btn btn-error" onclick="javascript:history.back();return false;">Cancel</button>
+        <button type="submit" class="save btn btn-success">Save</button>
+        <button type="button" class="btn btn-default" onclick="{% url 'frogs:notes_create' %}">Cancel</button>
     </form>
     </div></div>
 </div>

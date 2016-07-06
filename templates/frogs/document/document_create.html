@@ -1,0 +1,22 @@
+{% extends "frogs/base.html" %}
+
+{% block content %}
+<div class="container ">
+    <div class="page-header">
+    {% if form.is_bound %}
+        <h2>Edit Document </h2>
+    {% else %}
+        <h2>New Document </h2>
+    {% endif %}
+    </div>
+    <div class="row col-md-6">
+        <div class="well">
+    <form role="form" method="POST" enctype="multipart/form-data" data-ajax="false">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-success">Save</button>
+        <button type="button" class="btn btn-default" onclick="{% url 'frogs:documents_list' %}">Cancel</button>
+    </form>
+    </div></div>
+</div>
+{% endblock %}

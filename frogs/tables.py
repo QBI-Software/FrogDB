@@ -1,11 +1,11 @@
 import django_tables2 as tables
+import os
 from django_tables2.utils import A, AttributeDict
 from django.utils.html import format_html, escape
 from datetime import date
-from django.utils.safestring import mark_safe
 
-from .models import Transfer,Experiment,Frog,Permit, Notes
-from .models import SiteConfiguration
+from .models import Transfer,Experiment,Frog,Permit, Notes, Document
+
 
 class ExperimentTable(tables.Table):
     #selection = tables.CheckBoxColumn(accessor="pk", orderable=False)
@@ -170,11 +170,10 @@ class OperationTable(tables.Table):
         if not value:
             return format_html('<span style="color:blue">Max ops</span>')
         delta = value - date.today()
-        if delta.days == 0:
+        if delta.days <= 0:
             return format_html('<span style="color:green">OK</span>')
-        elif delta.days < 1:
-            return format_html('<span style="color:green">%s %s ago</span>' % (abs(delta.days),
-                                   ("day" if abs(delta.days) == 1 else "days")))
+        elif delta.days < 1: #note this is not active
+            return format_html('<span style="color:green">%s %s ago</span>' % (abs(delta.days),("day" if abs(delta.days) == 1 else "days")))
         elif delta.days == 1:
             return format_html('<span style="color:red">Tomorrow</span>')
         elif delta.days > 1:
@@ -204,4 +203,25 @@ class NotesTable(tables.Table):
         fields = ['note_date','notes_species','notes','initials']
 
         order_by_field = '-note_date'
+        sortable = True
+
+
+class DocumentTable(tables.Table):
+    id = tables.LinkColumn('frogs:documents_detail', text='View', args=[A('pk')], verbose_name='')
+    created = tables.DateColumn(verbose_name="Uploaded", format='d-M-Y', accessor=A('docfile'), orderable=True)
+
+    #def render_docfile(self,value):
+    #    return value.name[2:]
+
+    def render_created(self,value):
+        #print("DEBUG: File=", value.storage.created_time(value.name))
+        return value.storage.created_time(value.name)
+
+    def render_size(self,value):
+        return value.storage.size(value.name)
+
+    class Meta:
+        model = Document
+        attrs = {"class": "ui-responsive table table-hover"}
+        fields = ['docfile','description','created','size','id']
         sortable = True

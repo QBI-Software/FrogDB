@@ -1,0 +1,40 @@
+{% extends "frogs/base.html" %}{% block title %}Document - details{% endblock %}{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>View Document Details</h2></div>
+    <div class="col-md-6">
+        <div class="well">
+            <table id="view-table" class="ui-responsive table table-hover">
+                <tbody>
+                <tr>
+                    <th>Document</th>
+                    <td>{{document.docfile.name|slice:"2:"}}</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{document.description|force_escape}}</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="col-md-4">
+        <div class="container">
+            <h4>Choose an action</h4>
+            <div class="ui-responsive btn-group-vertical">
+                <a class="btn btn-default" href="{% url 'frogs:documents_update' document.id %}" title="Edit document">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:documents_delete' document.id %}" title="Delete document">Delete</a>
+                {% if document.getextension == '.pdf' %}
+                <a class="btn btn-default" href="/static/pdfjs/web/viewer.html?file={{document.docfile.url}}" title="View and download PDF">View
+                    and Download</a>
+                {% else %}
+                <a class="btn btn-default" href="{{document.docfile.url}}" title="Download document" class="glyphicon glyphicon-download-alt">Download</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

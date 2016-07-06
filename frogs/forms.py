@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
 from django.contrib.auth.forms import AuthenticationForm
 from django import forms
-from django.forms import Form, ModelForm, DateInput, ImageField
+from django.forms import Form, ModelForm, DateInput
 from suit_ckeditor.widgets import CKEditorWidget
 from suit.widgets import HTML5Input
 from captcha.fields import CaptchaField
-from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Qap, Notes, SiteConfiguration, \
-    Species, PermitAttachment
+from .models import Permit, Frog, Operation, Transfer, Experiment, FrogAttachment, Notes, SiteConfiguration, Species, PermitAttachment, Document
 from django.contrib.auth.models import User
 
 
@@ -247,6 +246,26 @@ class PermitAttachmentForm(ModelForm):
         model = PermitAttachment
         fields = ('permitid',
                   'docfile',
+                  'description'
+                  )
+        widgets = {
+            'docfile': forms.FileInput()
+        }
+
+
+class DocumentForm(ModelForm):
+    docfile = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    class Meta:
+        model = Document
+        fields = ('docfile',
                   'description'
                   )
         widgets = {

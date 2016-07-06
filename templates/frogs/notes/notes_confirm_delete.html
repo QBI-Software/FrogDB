@@ -9,8 +9,7 @@
             <form action="" method="post">{% csrf_token %}
                 <p>Are you sure you want to delete "{{ object }}"?</p>
                 <input type="submit" class="btn btn-success" value="Confirm"/>
-                <button type="button" class="btn btn-default" onclick="javascript:history.back();return false;">Cancel
-                </button>
+                <button type="button" class="btn btn-default" onclick="{% url 'frogs:notes_list' %}">Cancel</button>
             </form>
         </div>
     </div>
