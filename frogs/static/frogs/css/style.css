@@ -120,3 +120,8 @@ ul.errorlist{
     float:right;
     font-size: 0.8em;
 }
+
+/** Search form **/
+#searchform label{
+    width:30%;
+}

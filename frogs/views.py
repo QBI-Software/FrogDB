@@ -389,7 +389,7 @@ class FrogCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
     template_name = 'frogs/frog/frog_create.html'
     form_class = FrogForm
     raise_exception = True
-    permission_required = 'frogs.frog.can_add_frog'
+    permission_required = 'frogs.add_frog'
 
     def form_valid(self, form):
         try:
@@ -408,7 +408,7 @@ class FrogUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
     form_class = FrogForm
     template_name = 'frogs/frog/frog_create.html'
     raise_exception = True
-    permission_required = 'frogs.frog.can_change_frog'
+    permission_required = 'frogs.change_frog'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
@@ -418,7 +418,7 @@ class FrogDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
     success_url = reverse_lazy("frogs:frog_list")
     template_name = 'frogs/frog/frog_confirm_delete.html'
     raise_exception = True
-    permission_required = 'frogs.frog.can_delete_frog'
+    permission_required = 'frogs.delete_frog'
 
 class FrogDeath(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Frog
@@ -426,7 +426,7 @@ class FrogDeath(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView)
     context_object_name = 'frog'
     template_name = 'frogs/frog/frog_death.html'
     raise_exception = True
-    permission_required = 'frogs.frog.can_change_frog'
+    permission_required = 'frogs.change_frog'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
@@ -437,7 +437,7 @@ class FrogDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateVi
     context_object_name = 'frog'
     template_name = 'frogs/frog/frog_disposal.html'
     raise_exception = True
-    permission_required = 'frogs.frog.can_change_frog'
+    permission_required = 'frogs.change_frog'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.id])
@@ -448,7 +448,7 @@ class FrogAttachment(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     context_object_name = 'frog'
     template_name = 'frogs/frog/frog_upload.html'
     raise_exception = True
-    permission_required = 'frogs.frog_attachment.can_add_frog_attachment'
+    permission_required = 'frogs.add_frogattachment'
 
     def get_success_url(self):
         return reverse('frogs:frog_detail', args=[self.object.frogid.pk])
@@ -465,7 +465,7 @@ class FrogBulkCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.FormVi
     success_url = reverse_lazy("frogs:frog_list")
     fid = None
     raise_exception = True
-    permission_required = 'frogs.frog.can_add_frog'
+    permission_required = 'frogs.add_frog'
 
     def form_valid(self, form):
         #Get shipment: number female/male
@@ -530,7 +530,7 @@ class FrogBulkDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.FormVi
     template_name = 'frogs/frog/bulkfrog_confirm_delete.html'
     form_class=BulkFrogDeleteForm
     raise_exception = True
-    permission_required = 'frogs.frog.can_delete_frog'
+    permission_required = 'frogs.delete_frog'
 
 
     def post(self, request, *args, **kwargs):
@@ -571,7 +571,7 @@ class FrogBulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.Form
     form_class = BulkFrogDisposalForm
     model = Frog
     raise_exception = True
-    permission_required = 'frogs.frog.can_change_frog'
+    permission_required = 'frogs.change_frog'
 
     def form_valid(self, form):
         bulkfrogs = form.cleaned_data['frogs']
@@ -710,7 +710,7 @@ class OperationCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.Creat
     template_name = 'frogs/operation/operation_create.html'
     form_class = OperationForm
     raise_exception = True
-    permission_required = 'frogs.operation.can_add_operation'
+    permission_required = 'frogs.add_operation'
 
     def get_success_url(self):
         frog = Frog.objects.filter(frogid=self.object.frogid)
@@ -732,7 +732,7 @@ class OperationUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.Updat
     form_class = OperationForm
     template_name = 'frogs/operation/operation_create.html'
     raise_exception = True
-    permission_required = 'frogs.operation.can_change_operation'
+    permission_required = 'frogs.change_operation'
 
     def get_success_url(self):
         frogid = self.object.frogid
@@ -745,7 +745,7 @@ class OperationDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.Delet
     model = Operation
     template_name = 'frogs/operation/operation_confirm_delete.html'
     raise_exception = True
-    permission_required = 'frogs.operation.can_delete_operation'
+    permission_required = 'frogs.delete_operation'
 
     def get_success_url(self):
         frog = Frog.objects.filter(frogid=self.object.frogid)
@@ -797,7 +797,7 @@ class TransferCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     template_name = 'frogs/transfer/transfer_create.html'
     form_class = TransferForm
     raise_exception = True
-    permission_required = 'frogs.transfer.can_add_transfer'
+    permission_required = 'frogs.add_transfer'
 
     def get_initial(self):
         opid = self.kwargs.get('operationid')
@@ -812,7 +812,7 @@ class TransferUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
     form_class = TransferForm
     template_name = 'frogs/transfer/transfer_create.html'
     raise_exception = True
-    permission_required = 'frogs.transfer.can_change_transfer'
+    permission_required = 'frogs.change_transfer'
 
     def get_success_url(self):
         return reverse('frogs:transfer_detail', args=[self.object.id])
@@ -822,7 +822,7 @@ class TransferDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
     template_name = 'frogs/transfer/transfer_confirm_delete.html'
     success_url = reverse_lazy("frogs:transfer_list")
     raise_exception = True
-    permission_required = 'frogs.transfer.can_delete_transfer'
+    permission_required = 'frogs.delete_transfer'
 
 ########## EXPERIMENTS ############################################
 class ExperimentList(LoginRequiredMixin, generic.ListView):
@@ -905,7 +905,7 @@ class ExperimentCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     template_name = 'frogs/experiment/experiment_create.html'
     form_class = ExperimentForm
     raise_exception = True
-    permission_required = 'frogs.experiment.can_add_experiment'
+    permission_required = 'frogs.add_experiment'
 
     def get_initial(self):
         opid = self.kwargs.get('transferid')
@@ -921,7 +921,7 @@ class ExperimentUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
     form_class = ExperimentForm
     template_name = 'frogs/experiment/experiment_create.html'
     raise_exception = True
-    permission_required = 'frogs.experiment.can_change_experiment'
+    permission_required = 'frogs.change_experiment'
 
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
@@ -930,7 +930,7 @@ class ExperimentDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.Dele
     model = Experiment
     success_url = reverse_lazy("frogs:experiment_list")
     raise_exception = True
-    permission_required = 'frogs.experiment.can_delete_experiment'
+    permission_required = 'frogs.delete_experiment'
 
 class ExperimentDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Experiment
@@ -938,7 +938,7 @@ class ExperimentDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
     context_object_name = 'experiment'
     template_name = 'frogs/experiment/experiment_create.html'
     raise_exception = True
-    permission_required = 'frogs.experiment.can_change_experiment'
+    permission_required = 'frogs.change_experiment'
 
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
@@ -950,7 +950,7 @@ class ExperimentAutoclave(LoginRequiredMixin, PermissionRequiredMixin, generic.U
     context_object_name = 'experiment'
     template_name = 'frogs/experiment/experiment_create.html'
     raise_exception = True
-    permission_required = 'frogs.experiment.can_change_experiment'
+    permission_required = 'frogs.change_experiment'
 
     def get_success_url(self):
         return reverse('frogs:experiment_detail', args=[self.object.id])
@@ -993,7 +993,7 @@ class BulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView
     model = Experiment
     raise_exception = True
     location = 'All'
-    permission_required = 'frogs.experiment.can_change_experiment'
+    permission_required = 'frogs.change_experiment'
 
     def get_form_kwargs(self, **kwargs):
         #print("DEBUG:getformkwargs:", kwargs)
@@ -1046,7 +1046,7 @@ class BulkAutoclave(LoginRequiredMixin, PermissionRequiredMixin, generic.FormVie
     form_class = BulkExptAutoclaveForm
     model = Experiment
     raise_exception = True
-    permission_required = 'frogs.experiment.can_change_experiment'
+    permission_required = 'frogs.change_experiment'
 
     def get_form_kwargs(self, **kwargs):
         #print("DEBUG:getformkwargs:", kwargs)
@@ -1109,7 +1109,7 @@ class NotesCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateVie
     form_class = NotesForm
     success_url = reverse_lazy('frogs:notes_list')
     raise_exception = True
-    permission_required = 'frogs.notes.can_add_notes'
+    permission_required = 'frogs.add_notes'
 
 class NotesUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Notes
@@ -1117,14 +1117,14 @@ class NotesUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateVie
     template_name = 'frogs/notes/notes_create.html'
     success_url = reverse_lazy('frogs:notes_list')
     raise_exception = True
-    permission_required = 'frogs.notes.can_change_notes'
+    permission_required = 'frogs.change_notes'
 
 class NotesDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Notes
     success_url = reverse_lazy("frogs:notes_list")
     template_name = 'frogs/notes/notes_confirm_delete.html'
     raise_exception = True
-    permission_required = 'frogs.notes.can_delete_notes'
+    permission_required = 'frogs.delete_notes'
 
 # DOCUMENTS
 class DocumentList(LoginRequiredMixin, generic.ListView):
@@ -1149,7 +1149,7 @@ class DocumentCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     form_class = DocumentForm
     success_url = reverse_lazy('frogs:documents_list')
     raise_exception = True
-    permission_required = 'frogs.document.can_add_document'
+    permission_required = 'frogs.add_document'
 
     def get_success_url(self):
         return reverse('frogs:documents_detail', args=[self.object.pk])
@@ -1161,11 +1161,11 @@ class DocumentUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
     template_name = 'frogs/document/document_create.html'
     success_url = reverse_lazy('frogs:documents_list')
     raise_exception = True
-    permission_required = 'frogs.document.can_change_document'
+    permission_required = 'frogs.change_document'
 
 class DocumentDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Document
     success_url = reverse_lazy("frogs:documents_list")
     template_name = 'frogs/document/document_confirm_delete.html'
     raise_exception = True
-    permission_required = 'frogs.document.can_delete_document'
+    permission_required = 'frogs.delete_document'

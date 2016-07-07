@@ -2,20 +2,27 @@
 {% block content %}{% load staticfiles %}
 <div class="container">
     <div class="jumbotron">
-        <span ><img src="{% static "frogs/img/logo.png" %}" align="center" alt="QBI, The University of Queensland"/></span>
+        <span><img src="{% static "frogs/img/logo.png" %}" align="center" alt="QBI, The University of Queensland"/></span>
         <h1>Welcome to the QBI Frog database</h1>
         <p>The QBI Frog database stores information of the Quarantine Frog Colony housed at AIBN. This includes
             information on identification, health,
             oocyte harvests and tracking and disposal of all quarantine material.
         </p>
-        <p>The Frog database replaces currently handwritten data forms and manually generated reports.
-           {% if species and user.is_authenticated %}
-            <h4>Reports</h4><ol> {% for sp in species %}
-                <li><a href="{% url 'frogs:froglog_report' sp.name %}" class="btn btn-default">{{ sp.name }} Report</a></li>
+        <p>The Frog database replaces currently handwritten data forms and manually generated reports.</p>
+        <div align="center">
+            <ul class="list-group">
+                <li class="list-group-item"><h3>Reports</h3></li>
+
+                {% if species and user.is_authenticated %}
+                {% for sp in species %}
+                <li class="list-group-item">
+                    <a class="btn btn-primary" href="{% url 'frogs:froglog_report' sp.name %}" class="btn btn-default">{{ sp.name }} Report</a>
+                </li>
                 {% endfor %}
-            </ol>
-            {% endif %}
-        </p>
+
+                {% endif %}
+            </ul>
+        </div>
     </div>
 
     <div class="row">
@@ -27,10 +34,16 @@
                 {% else %}
                 <p>There are no shipments.</p>
                 {% endif %}
-                {% if user.is_authenticated and perms.frogs.can_add_permit %}
-                    <p><a href="{% url 'frogs:permit_create' %}" class="btn btn-success">Create Shipment</a>
-                    </p>
-                {% endif %}
+
+                <p>
+                    {% if user.is_authenticated and perms.frogs.add_permit %}
+                    <a href="{% url 'frogs:permit_create' %}" class="btn btn-success">Create Shipment</a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'frogs:permit_list' %}" class="btn btn-danger">View Shipments</a>
+                    {% endif %}
+                </p>
+
             </div>
         </div>
 
@@ -39,10 +52,10 @@
                 <h3>Frogs</h3>
                 {% if frog_list %}
                 <p>The database currently contains {{ frog_list }} frogs.</p>
-                    {% if user.is_authenticated %}
-                    <p><a href="{% url 'frogs:frog_list_filter' %}" class="btn btn-info">View Frogs</a>
-                    </p>
-                    {% endif %}
+                {% if user.is_authenticated %}
+                <p><a href="{% url 'frogs:frog_list_filter' %}" class="btn btn-info">View Frogs</a>
+                </p>
+                {% endif %}
                 {% else %}
                 <p>There are no frogs in the database.</p>
                 {% endif %}
@@ -55,10 +68,10 @@
                 <h3>Operations</h3>
                 {% if op_list %}
                 <p>There are currently {{ op_list }} frogs ready for operation.</p>
-                    {% if user.is_authenticated %}
-                    <p><a href="{% url 'frogs:operation_summary' %}#all" class="btn btn-warning">View Operations</a>
-                    </p>
-                    {% endif %}
+                {% if user.is_authenticated %}
+                <p><a href="{% url 'frogs:operation_summary' %}#all" class="btn btn-warning">View Operations</a>
+                </p>
+                {% endif %}
                 {% else %}
                 <p>There are no frogs ready for operation.</p>
                 {% endif %}

@@ -69,16 +69,23 @@
         <div class="container">
             <h4>Choose an action</h4>
             <div class="ui-responsive btn-group-vertical">
-                <a class="btn btn-default" href="{% url 'frogs:frog_update' frog.id %}">Edit</a>
+                {% if perms.frogs.add_frogattachment %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_upload' frog.id %}">Images</a>
-                {% if frog.gender == 'female' and frog.operation_set.count < site_config.max_ops %}
+                {% endif %}
+                {% if perms.frogs.change_frog %}
+                <a class="btn btn-default" href="{% url 'frogs:frog_update' frog.id %}">Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_death' frog.id %}">Death</a>
+                    {% if frog.death.name != 'Alive' %}
+                    <a class="btn btn-default" href="{% url 'frogs:frog_disposal' frog.id %}">Disposal</a>
+                    {% endif %}
+                {% endif %}
+                {% if perms.frogs.add_operation and frog.gender == 'female' and frog.death.name == 'Alive' and frog.operation_set.count < site_config.max_ops %}
                 <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}">Add Operation</a>
                 {% endif %}
-                <a class="btn btn-default" href="{% url 'frogs:frog_death' frog.id %}">Death</a>
-                {% if frog.death.name != 'Alive' %}
-                <a class="btn btn-default" href="{% url 'frogs:frog_disposal' frog.id %}">Disposal</a>
-                {% endif %}
+                {% if perms.frogs.delete_frog %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_delete' frog.id %}">Delete</a>
+                {% endif %}
+                <a class="btn btn-default" onclick="javascript:history.back();return false;">Return </a>
             </div>
         </div>
 
@@ -113,13 +120,24 @@
                         <ul class="nav nav-pills">
                             <li><a href="{% url 'frogs:transfer_list_byop' operation.id %}" title="View Transfers">
                                 <span class="badge">{{operation.transfer_set.count}}</span></a>
+                                {% if perms.frogs.add_transfer %}
                                 <a href="{% url 'frogs:transfer_create' operation.id %}" title="New Transfer">
-                                    <i class="glyphicon glyphicon-plus-sign"></i></a></li></ul>
+                                    <i class="glyphicon glyphicon-plus-sign"></i></a>
+                                {% endif %}
+                            </li>
+                        </ul>
                     </td>
                     <td>
                         <ul class="nav nav-pills nav-stacked">
-                        <li><a href="{% url 'frogs:operation_update' operation.id %}" title="Edit Operation"><i class="glyphicon glyphicon-pencil"></i></a>
-                            <a href="{% url 'frogs:operation_delete' operation.id %}" title="Delete Operation"><i class="glyphicon glyphicon-remove"></i></a></li>
+                        <li>
+                            {% if perms.frogs.change_operation %}
+                            <a href="{% url 'frogs:operation_update' operation.id %}" title="Edit Operation"><i class="glyphicon glyphicon-pencil"></i></a>
+                            {% endif %}
+                            {% if perms.frogs.delete_operation %}
+                            <a href="{% url 'frogs:operation_delete' operation.id %}" title="Delete Operation"><i class="glyphicon glyphicon-remove"></i></a>
+                            {% endif %}
+
+                        </li>
                         </ul>
                     </td>
                 </tr>

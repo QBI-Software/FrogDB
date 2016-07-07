@@ -40,10 +40,16 @@
         <div class="container">
             <h4>Choose an action</h4>
             <div class="ui-responsive btn-group-vertical">
+                {% if perms.frogs.change_transfer %}
                 <a class="btn btn-default" href="{% url 'frogs:transfer_update' transfer.id %}">Edit</a>
+                {% endif %}
+                {% if perms.frogs.delete_transfer %}
                 <a class="btn btn-default" href="{% url 'frogs:transfer_delete' transfer.id %}">Delete</a>
+                {% endif %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_detail' transfer.operationid.frogid.id %}">View Frog</a>
+                {% if perms.frogs.add_experiment %}
                 <a class="btn btn-default" href="{% url 'frogs:experiment_create' transfer.id %}">Add Experiment</a>
+                {% endif %}
                  <a class="btn btn-default" href="{% url 'frogs:experiment_list_bytransfer' transfer.id %}">View Experiments <span class="badge">{{transfer.experiment_set.count}}</span></a>
             </div>
         </div>

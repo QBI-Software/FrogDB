@@ -147,7 +147,7 @@ class PermitReportTable(tables.Table):
     aqis = tables.LinkColumn('frogs:permit_detail', accessor=A('aqis'),  args=[A('pk')], verbose_name='AQIS Permit #' )
     qen = tables.Column(footer="Total Frogs:")
     get_totalfrogs = SummingColumn(verbose_name="Shipped/Born")
-    frogs_disposed = SummingColumn(verbose_name="Disposed")
+    frogs_deceased = SummingColumn(verbose_name="Disposed")
     get_females_remaining = SummingColumn(verbose_name="Remaining (Female)")
     get_males_remaining = SummingColumn(verbose_name="Remaining (Male)")
     arrival_date = tables.DateColumn(format='d-M-Y')
@@ -155,7 +155,7 @@ class PermitReportTable(tables.Table):
     class Meta:
         model = Permit
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['aqis','qen', 'arrival_date','get_totalfrogs','frogs_disposed', 'get_females_remaining','get_males_remaining',]
+        fields = ['aqis','qen', 'arrival_date','get_totalfrogs','frogs_deceased', 'get_females_remaining','get_males_remaining',]
 
         order_by_field = 'arrival_date'
         sortable = True
@@ -208,7 +208,8 @@ class NotesTable(tables.Table):
 
 class DocumentTable(tables.Table):
     id = tables.LinkColumn('frogs:documents_detail', text='View', args=[A('pk')], verbose_name='')
-    created = tables.DateColumn(verbose_name="Uploaded", format='d-M-Y', accessor=A('docfile'), orderable=True)
+    created = tables.DateTimeColumn(verbose_name="Uploaded", format='d-M-Y hh:mm', accessor=A('docfile'), orderable=True)
+    size = tables.Column(verbose_name="Size (kB)",accessor=A('docfile'), orderable=True)
 
     #def render_docfile(self,value):
     #    return value.name[2:]
@@ -218,7 +219,7 @@ class DocumentTable(tables.Table):
         return value.storage.created_time(value.name)
 
     def render_size(self,value):
-        return value.storage.size(value.name)
+        return value.storage.size(value.name)/1000
 
     class Meta:
         model = Document

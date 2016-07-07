@@ -56,52 +56,67 @@
         </div>
 
 
-
         <div class="well">
             <h2>Attachments</h2>
             <table id="docs-table" class="ui-responsive table table-hover">
                 <tbody>
-                    <tr>
-                        <th>Filename</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
+                <tr>
+                    <th>Filename</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
 
-                        {% for doc in shipment.permitattachment_set.all %}
-                        <tr><td>{{doc.docfile.name|slice:"2:"}}</td>
-                         <td>{{doc.description|force_escape}}</td>
+                {% for doc in shipment.permitattachment_set.all %}
+                <tr>
+                    <td>{{doc.docfile.name|slice:"2:"}}</td>
+                    <td>{{doc.description|force_escape}}</td>
 
-                        <td>
-                            {% if doc.getextension == '.pdf' %}
-                            <a href="/static/pdfjs/web/viewer.html?file={{doc.docfile.url}}" title="View and download PDF" class="glyphicon glyphicon-cloud-download">&nbsp;</a>
-                            {% else %}
-                            <a href="{{doc.docfile.url}}" title="Download document" class="glyphicon glyphicon-download-alt">&nbsp;</a>
-                            {% endif %}
+                    <td>
+                        {% if doc.getextension == '.pdf' %}
+                        <a href="/static/pdfjs/web/viewer.html?file={{doc.docfile.url}}" title="View and download PDF"
+                           class="glyphicon glyphicon-cloud-download">&nbsp;</a>
+                        {% else %}
+                        <a href="{{doc.docfile.url}}" title="Download document"
+                           class="glyphicon glyphicon-download-alt">&nbsp;</a>
+                        {% endif %}
 
-                        <a href="{% url 'frogs:permitattachment_delete' doc.id %}" title="Delete document" class="glyphicon glyphicon-trash">&nbsp;</a></td>
-                        </tr>
-                            {% endfor %}
+                        <a href="{% url 'frogs:permitattachment_delete' doc.id %}" title="Delete document"
+                           class="glyphicon glyphicon-trash">&nbsp;</a></td>
+                </tr>
+                {% endfor %}
 
-                    </tbody>
-                </table>
-            </div>
-         </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 
     <div class="col-md-4">
         <div class="container">
+
             <h4>Choose an action</h4>
             <div class="ui-responsive btn-group-vertical">
+                {% if perms.frogs.add_permit %}
                 <a class="btn btn-default" href="{% url 'frogs:permit_update' shipment.id %}">Edit</a>
-                <a class="btn btn-default" href="{% url 'frogs:permit_delete' shipment.id %}">Delete</a>
-                <a class="btn btn-default" href="{% url 'frogs:permit_upload' shipment.id %}">Add attachments</a>
-                {% if shipment.frog_set.count <= 0 %}
-                <a class="btn btn-default" href="{% url 'frogs:bulkfrog_create' shipment.id %}">Generate Frog records</a>
-                {% else %}
-                <a class="btn btn-default" href="{% url 'frogs:bulkfrog_delete' shipment.id %}">Delete Frog records</a>
-                <a class="btn btn-default" href="{% url 'frogs:frog_list_byshipment' shipment.id %}">View Frogs<span class="badge">{{shipment.frog_set.count}}</span></a>
                 {% endif %}
+                {% if perms.frogs.delete_permit %}
+                <a class="btn btn-default" href="{% url 'frogs:permit_delete' shipment.id %}">Delete</a>
+                {% endif %}
+                {% if perms.frogs.add_permit_attachment %}
+                <a class="btn btn-default" href="{% url 'frogs:permit_upload' shipment.id %}">Add attachments</a>
+                {% endif %}
+
+                {% if perms.frogs.add_permit and shipment.frog_set.count <= 0 %}
+
+                <a class="btn btn-default" href="{% url 'frogs:bulkfrog_create' shipment.id %}">Generate Frog records</a>
+                {% endif %}
+                {% if perms.frogs.delete_permit and shipment.frog_set.count > 0 %}
+                <a class="btn btn-default" href="{% url 'frogs:bulkfrog_delete' shipment.id %}">Delete Frog records</a>
+                {% endif %}
+                <a class="btn btn-default" href="{% url 'frogs:frog_list_byshipment' shipment.id %}">View Frogs <span class="badge">{{shipment.frog_set.count}}</span></a>
+                <a class="btn btn-default" onclick="javascript:history.back();return false;">Return </a>
             </div>
+
         </div>
     </div>
     {% endblock %}

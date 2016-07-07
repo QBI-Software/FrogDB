@@ -136,20 +136,26 @@ class Permit(models.Model):
     def get_totalfrogs(self):
         return (self.females + self.males)
 
-    def frogs_disposed(self):
+    def frogs_disposed(self, gender=None):
         qs = Frog.objects.filter(qen=self).filter(disposed=True)
+        if (gender is not None):
+            qs = qs.filter(gender=gender)
+        return qs.count()
+
+    def frogs_deceased(self, gender=None):
+        qs = Frog.objects.filter(qen=self).exclude(death__name='Alive')
+        if (gender is not None):
+            qs = qs.filter(gender=gender)
         return qs.count()
 
     def get_frogs_remaining(self):
         return self.get_totalfrogs() - self.frogs_disposed()
 
     def get_females_remaining(self):
-        qs = Frog.objects.filter(qen=self).filter(gender='female').filter(disposed=True)
-        return self.females - qs.count()
+        return self.females - self.frogs_deceased('female')
 
     def get_males_remaining(self):
-        qs = Frog.objects.filter(qen=self).filter(gender='male').filter(disposed=True)
-        return self.males - qs.count()
+        return self.females - self.frogs_deceased('male')
 
 
 class PermitAttachment(models.Model):

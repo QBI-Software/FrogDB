@@ -5,13 +5,20 @@
 {% block content %}
 <div class="container">
     <div class="row col-md-12">
-    <div class="page-header"><h2>{{ list_title }}</h2></div>
-    <p><a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
-        {% if table %}
-        <a href="{% url 'frogs:bulkfrog_disposal' %}" class="btn btn-success">Dispose Frogs</a></p>
+        <div class="page-header"><h2>{{ list_title }}</h2></div>
+        <p>
+            {% if perms.frogs.add_frog %}
+            <a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
+            {% endif %}
+            {% if table.rows %}
+            {% if perms.frogs.delete_frog %}
+            <a href="{% url 'frogs:bulkfrog_disposal' %}" class="btn btn-success">Dispose Frogs</a></p>
+        {% endif %}
         {% render_table table %}
         {% else %}
-        </p>
+        <p class="alert alert-warning">No Frogs for this shipment in the database</p>
         {% endif %}
-</div></div>
+        </p>
+    </div>
+</div>
 {% endblock %}

@@ -4,10 +4,10 @@
 
 <div class="sidebar">
    <div class="well">
-    <button data-toggle="collapse" data-target="#searchform"><h4>Filter transfers</h4></button>
+    <button data-toggle="collapse" data-target="#searchform"><h4>Search transfers</h4></button>
        <div id="searchform" class="collapse">
             <form method='GET'>
-                {{ filter.form.as_table }}
+                {{ filter.form.as_p }}
                 <br/>
                 <input type='submit' class="btn btn-info" value='Search'/>
                 <a href='{{ request.path }}' class="btn btn-default">Clear</a>
@@ -28,10 +28,10 @@
 <div class="container">
     <div class="row col-md-12">
     <div class="page-header"><h2>Transfers</h2></div>
-    {% if table %}
+    {% if table.rows %}
         {% render_table table %}
     {% else %}
-        <p>No transfers in database</p>
+        <p class="alert alert-warning">No transfers in database</p>
     {% endif %}
     </div>
 </div>

@@ -7,7 +7,7 @@
     <button data-toggle="collapse" data-target="#searchform"><h4>Search for Frogs</h4></button>
        <div id="searchform" class="collapse">
             <form method='GET'>
-                {{ filter.form }}
+                {{ filter.form.as_p }}
                 <br/>
                 <input type='submit' class="btn btn-info" value='Search'/>
                 <a href='{{ request.path }}' class="btn btn-default">Clear</a>
@@ -25,13 +25,20 @@
 {% block content %}
 <div class="container">
     <div class="row col-md-12">
-    <div class="page-header"><h2>Frogs</h2></div>
-    <p><a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
-        {% if table %}
-        <a href="{% url 'frogs:bulkfrog_disposal' %}" class="btn btn-success">Dispose Frogs</a></p>
-    {% render_table table %}
-    {% else %}
-    </p>
-    {% endif %}
-</div></div>
+        <div class="page-header"><h2>Frogs</h2></div>
+        <p>
+            {% if perms.frogs.add_frog %}
+            <a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
+            {% endif %}
+            {% if table.rows %}
+            {% if perms.frogs.delete_frog %}
+            <a href="{% url 'frogs:bulkfrog_disposal' %}" class="btn btn-success">Dispose Frogs</a></p>
+        {% endif %}
+        {% render_table table %}
+        {% else %}
+        <p class="alert alert-warning">No Frogs in the database</p>
+        {% endif %}
+        </p>
+    </div>
+</div>
 {% endblock %}

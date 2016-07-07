@@ -19,9 +19,11 @@
     <div class="tab-content">
     <div id="{{location}}" class="tab-pane fade in active">
         {% if expts.rows %}
-             <div class="well-sm" align="right">
-                <a href="{% url 'frogs:expt_bulkautoclave' location %}" class="btn btn-success">Bulk Autoclave</a>
-            </div>
+            {% if perms.frogs.change_experiment %}
+                 <div class="well-sm" align="right">
+                    <a href="{% url 'frogs:expt_bulkautoclave' location %}" class="btn btn-success">Bulk Autoclave</a>
+                </div>
+            {% endif %}
             {% render_table expts %}
         {% else %}
             <div class="alert alert-warning"><p>No experiments in database</p></div>

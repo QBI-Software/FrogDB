@@ -28,8 +28,13 @@
         <div class="container">
             <h4>Choose an action</h4>
             <div class="ui-responsive btn-group-vertical">
+                {% if perms.frogs.change_notes %}
                 <a class="btn btn-default" href="{% url 'frogs:notes_update' notes.id %}">Edit</a>
+                {% endif %}
+                {% if perms.frogs.delete_notes %}
                 <a class="btn btn-default" href="{% url 'frogs:notes_delete' notes.id %}">Delete</a>
+                {% endif %}
+                <a class="btn btn-default" onclick="javascript:history.back();return false;">Return </a>
             </div>
         </div>
     </div>

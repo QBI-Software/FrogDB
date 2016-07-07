@@ -107,11 +107,16 @@
         <div class="container">
             <h4>Choose an action</h4>
             <div class="ui-responsive btn-group-vertical">
+                {% if perms.frogs.change_experiment %}
                 <a class="btn btn-default" href="{% url 'frogs:experiment_update' expt.id %}">Edit</a>
-                <a class="btn btn-default" href="{% url 'frogs:experiment_delete' expt.id %}">Delete</a>
                 <a class="btn btn-default" href="{% url 'frogs:experiment_disposal' expt.id %}">Disposal</a>
                 <a class="btn btn-default" href="{% url 'frogs:experiment_autoclave' expt.id %}">Autoclave</a>
+                {% endif %}
+                {% if perms.frogs.delete_experiment %}
+                <a class="btn btn-default" href="{% url 'frogs:experiment_delete' expt.id %}">Delete</a>
+                {% endif %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_detail' expt.transferid.operationid.frogid.id %}">View Frog</a>
+                <a class="btn btn-default" onclick="javascript:history.back();return false;">Return</a>
              </div>
         </div>
     </div>
