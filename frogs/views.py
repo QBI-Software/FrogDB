@@ -883,8 +883,8 @@ class ExperimentTracking(LoginRequiredMixin, generic.ListView):
         #print("DEBUG: loc=", loc)
         #print("DEBUG: buildings=", buildings)
         #print("DEBUG: qaps=", qaps)
-        if (loc.upper() in qaps):
-            qs = qs.filter(expt_location__building=loc.upper())
+        if (loc != 'aaall'):
+            qs = qs.filter(expt_location__building__iexact=loc)
         table = ExperimentTable(qs)
         RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         context['location'] = loc
@@ -979,8 +979,8 @@ class DisposalList(LoginRequiredMixin, generic.ListView):
         buildings = {'aaall': 'All'}
         for q in qaps:
             buildings[q.lower()] = q
-        if (loc.upper() in qaps):
-            qs = qs.filter(expt_location__building=loc.upper())
+        if (loc != 'aaall'):
+            qs = qs.filter(expt_location__building__iexact=loc)
         table = DisposalTable(qs)
         RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         context['location'] = loc
