@@ -61,8 +61,8 @@ class IndexView(generic.ListView):
         return Transfer.objects.count()
 
     def get_operations_ready_count(self):
-        alive = Frog.objects.filter(death__alive=True)\
-            .filter(condition=False).filter(gender='female')
+        alive = Frog.objects.filter(death__alive=True) \
+            .filter(gender='female').exclude(condition=True)
         #print("DEBUG: Alive=", alive.count())
         ready = []
         for f in alive:
