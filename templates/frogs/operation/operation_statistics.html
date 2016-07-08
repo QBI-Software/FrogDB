@@ -70,7 +70,7 @@
       <td>  <div class="well ">
                 <table class="table-condensed">
                     {% for key,val in ops.items %}
-                    {% if key < site_config.max_ops %}
+                    {% if key <= site_config.max_ops %}
                     <tr><th>Frogs with {{key}} ops</th><td>{{val}}</td></tr>
                     {% else %}
                     <tr><th>Total number operations left</th><td>{{val}}</td></tr>

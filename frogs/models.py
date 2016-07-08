@@ -103,6 +103,7 @@ class Location(models.Model):
 
 class Deathtype(models.Model):
     name = models.CharField(_("Death Type"), max_length=100)
+    alive = models.BooleanField(_("Alive"), default=False)
 
     def __str__(self):
         return self.name
@@ -143,19 +144,22 @@ class Permit(models.Model):
         return qs.count()
 
     def frogs_deceased(self, gender=None):
-        qs = Frog.objects.filter(qen=self).exclude(death__name='Alive')
+        qs = Frog.objects.filter(qen=self).filter(death__alive=False)
         if (gender is not None):
             qs = qs.filter(gender=gender)
         return qs.count()
 
-    def get_frogs_remaining(self):
-        return self.get_totalfrogs() - self.frogs_disposed()
+    def get_frogs_remaining(self, gender=None):
+        qs = Frog.objects.filter(qen=self).filter(death__alive=True)
+        if (gender is not None):
+            qs = qs.filter(gender=gender)
+        return qs.count()
 
     def get_females_remaining(self):
-        return self.females - self.frogs_deceased('female')
+        return self.get_frogs_remaining('female')
 
     def get_males_remaining(self):
-        return self.females - self.frogs_deceased('male')
+        return self.get_frogs_remaining('male')
 
 
 class PermitAttachment(models.Model):
@@ -206,12 +210,6 @@ class Frog(models.Model):
     def get_absolute_url(self):
         return reverse('frog_detail', args=[str(self.pk)])
 
-    def died_recently(self):
-        if self.death_date:
-            delta = date.today() - datetime.strptime(self.death_date, "%Y-%m-%d").date()
-            return delta.days >= 0 and delta.days <= 30
-        else:
-            return False
 
     # derived fields
     def get_operations(self):
@@ -255,8 +253,8 @@ class Frog(models.Model):
         return rtn
 
     def get_disposed(self):
-        if (self.death.name != "Alive"):
-            if (not self.disposed):
+        if not self.death.alive:
+            if not self.disposed:
                 return 2
             else:
                 return 1
@@ -287,13 +285,13 @@ class Frog(models.Model):
     #Validation
     def clean(self):
         if self.death_date is not None:
-            deathdate = self.death_date #datetime.strptime(self.death_date, "%Y-%m-%d").date()
-            delta = date.today() - self.death_date #datetime.strptime(self.death_date, "%Y-%m-%d").date()
-            if delta.days < 0:
+            deltatoday = date.today() - self.death_date
+            deltaarrival = self.qen.arrival_date - self.death_date
+            if deltatoday.days < 0:
                 raise ValidationError("Date of death selected is in the future")
-            if deathdate < self.qen.arrival_date:
+            if deltaarrival.days > 0:
                 raise ValidationError("Date of death is before arrival")
-            if self.last_operation() != None and deathdate < self.last_operation():
+            if self.last_operation() != None and self.death_date < self.last_operation():
                 raise ValidationError("Date of death is before last operation")
 
 
@@ -344,28 +342,16 @@ class Operation(models.Model):
 
 
     def clean(self):
-        #clean opnum
+        # clean opnum
         config = SiteConfiguration.objects.get()
         max = config.max_ops
         if self.opnum > max:
             raise ValidationError("Can only create %d operations per frog" % max)
-        nums = []
-        if (self.frogid.operation_set.count() > 0):
-            for n in self.frogid.operation_set.all():
-                nums.append(n.opnum)
-            #if self.opnum in nums:
-           #     raise ValidationError("An operation %d already exists for this frog" % self.opnum)
 
-        #clean opdate
-        operation_interval = config.op_interval
+        # clean opdate
         if (self.opdate < self.frogid.qen.arrival_date):
             raise ValidationError("This operation is earlier than the shipment arrival date")
-        if (self.frogid.last_operation() is not None):
-            delta = self.opdate - self.frogid.last_operation()
-            if delta.days < operation_interval:
-                err = "This operation is only %d days since the last operation (an interval of %d days is required )" % (delta.days, operation_interval)
-                return err
-                #raise ValidationError(err) #REMOVE PREVENTION - requires message only
+
 
     def get_number_expts(self):
         total = 0
@@ -477,7 +463,7 @@ class Experiment(models.Model):
     waste_qty = models.PositiveSmallIntegerField(_("Waste quantity (L)"), blank=True, null=True)
     autoclave_indicator = models.BooleanField("Autoclave indicator", default=False)
     autoclave_complete = models.BooleanField("Autoclave complete", default=False)
-    autoclave_comments = models.CharField(_("Autoclave Comments"), max_length=200, null=True)
+    autoclave_comments = models.CharField(_("Autoclave Comments"), max_length=200, blank=True,null=True)
     autoclave_run = models.PositiveIntegerField(_("Autoclave Run"), default=0, null=True, blank=True)
     autoclave_machine = models.PositiveIntegerField(_("Autoclave Machine"), default=0, null=True, blank=True)
 

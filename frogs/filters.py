@@ -1,9 +1,10 @@
 import django_filters
 
-from .models import Permit, Frog, Transfer, Experiment, Operation
+from .models import Permit, Frog, Transfer, Experiment, Operation, Deathtype
 from django import template
 from datetime import date, timedelta
 from django.forms import DateInput
+from django.contrib.auth.models import User
 
 
 class PermitFilter(django_filters.FilterSet):
@@ -31,6 +32,8 @@ class FrogFilter(django_filters.FilterSet):
     gender = django_filters.ChoiceFilter(choices=[('', '---------'),
                                                   ('female', 'Female'),
                                                   ('male', 'Male')])
+    alive = django_filters.BooleanFilter(label="Alive", name='death', lookup_expr='alive')
+
     death_date = django_filters.DateFromToRangeFilter(label="Death Date (from-to)",
                                                       widget=django_filters.widgets.RangeWidget(
                                                           attrs={'class': 'myDateClass', 'type': 'date',
@@ -53,12 +56,16 @@ class TransferFilter(django_filters.FilterSet):
                                                          widget=django_filters.widgets.RangeWidget(
                                                              attrs={'class': 'myDateClass', 'type': 'date',
                                                                     'placeholder': 'Select a date'}), )
+    frogid = django_filters.CharFilter(label="Frog ID", name='operationid', lookup_expr='frogid__frogid')
+    transporter = django_filters.CharFilter(label="Transporter Name", name='transporter', lookup_expr='username')
+   # transporter = django_filters.ChoiceFilter(label="Transporter Name", name='transporter',
+   #    widget=django_filters.widgets.LinkWidget(
+   #         choices=User.objects.filter(groups__name__in=['GeneralStaff', 'AdminStaff'])))
 
-    # frogid = django_filters.ChoiceFilter(choices= Frog.objects.filter(gender='female'))
 
     class Meta:
         model = Transfer
-        # fields = ['frogid']
+
 
 
 class ExperimentFilter(django_filters.FilterSet):

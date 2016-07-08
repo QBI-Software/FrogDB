@@ -427,7 +427,7 @@ class BulkExptDisposalForm(ModelForm):
     def __init__(self, *args, **kwargs):
         location = kwargs.pop('location', None)
         super(BulkExptDisposalForm, self).__init__(*args, **kwargs)
-        if (location.lower() != 'all'):
+        if (location.lower() != 'aaall'):
             qs = Experiment.objects.filter(expt_disposed=False).filter(
                 expt_location__building=location.upper())
             self.fields['expts'].queryset = qs
@@ -468,7 +468,7 @@ class BulkExptAutoclaveForm(ModelForm):
         super(BulkExptAutoclaveForm, self).__init__(*args, **kwargs)
         qs = Experiment.objects.filter(expt_disposed=True).exclude(autoclave_complete=True)
         label = 'Select Waste stored at ALL locations'
-        if (location.lower() != 'all'):
+        if (location.lower() != 'aaall'):
             qs = qs.filter(expt_location__building=location.upper())
             label = 'Select Waste stored at %s' % location.upper()
         self.fields['expts'].queryset = qs

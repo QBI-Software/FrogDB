@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from wsgiref.util import FileWrapper
 from django.views import generic
 from django_tables2 import RequestConfig
+from django.contrib import messages
 from django.utils.http import is_safe_url
 from django.utils.encoding import smart_str
 from django.contrib.auth.forms import AuthenticationForm
@@ -60,17 +61,14 @@ class IndexView(generic.ListView):
         return Transfer.objects.count()
 
     def get_operations_ready_count(self):
-        alive = Frog.objects.filter(death_date__isnull=True)\
+        alive = Frog.objects.filter(death__alive=True)\
             .filter(condition=False).filter(gender='female')
         #print("DEBUG: Alive=", alive.count())
         ready = []
         for f in alive:
-            if (f.num_operations() == 0):
+            if (f.next_operation_OK()):
                 ready.append(f)
-            else:
-                delta = f.next_operation() - date.today()
-                if delta.days <= 0:
-                    ready.append(f)
+
         #print("DEBUG: Ready=", len(ready))
         return len(ready)
 
@@ -640,7 +638,7 @@ class OperationStatsView(LoginRequiredMixin, generic.TemplateView):
     raise_exception = True
 
     def get_queryset(self, **kwargs):
-        qs = Frog.objects.filter(gender='female').filter(death__name='Alive')
+        qs = Frog.objects.filter(gender='female').filter(death__alive=True)
         return qs
 
     def get_context_data(self, **kwargs):
@@ -657,23 +655,26 @@ class OperationStatsView(LoginRequiredMixin, generic.TemplateView):
         sp_left = []
         sp_opstates=[]
         for sp in frogspecies:
-            keys = range(0,config.max_ops+1)
+            keys = range(0,config.max_ops+2)
+
             opstates = {k:0 for k in keys}
             num = 0
-
+            #print("DEBUG:Ops=", opstates)
             qs_sp = qs.filter(species=sp)
             totals.append(qs_sp.count())
             #Get number operative
-            num_virgins = qs_sp.filter(operation__isnull=True).count()
-            qs_nonvirgins = qs_sp.filter(operation__isnull=False)
-            opstates[0]=num_virgins
-            for f in qs_nonvirgins:
+            num_none = qs_sp.filter(operation__isnull=True).count()
+            qs_ops = qs_sp.filter(operation__gt=0).distinct()
+            #print("DEBUG: 0=", num_none, "haveops=", qs_ops.count())
+            opstates[0]=num_none
+            for f in qs_ops:
                 if f.next_operation_OK:
                     num += 1
                 #Get opstates
+                #print("DEBUG:fid=", f.frogid, "numops=",f.num_operations())
                 opstates[f.num_operations()]+= 1
-
-            operative.append(num_virgins+num)
+            #print("DEBUG:Ops=", opstates)
+            operative.append(num_none+num)
             #Get numbers
             num_isolation = qs_sp.filter(remarks__icontains='isolation').count()
             isolation.append(num_isolation)
@@ -681,15 +682,15 @@ class OperationStatsView(LoginRequiredMixin, generic.TemplateView):
             observation.append(num_observation)
             num_condition = qs_sp.filter(condition=True).count()
             condition.append(num_condition)
-            actualoperative.append(num_virgins + num - num_isolation - num_observation - num_condition)
+            actualoperative.append(num_none + num - num_isolation - num_observation - num_condition)
             #Calculate total left
             t = 0
             for key, val in opstates.items():
                 t += (config.max_ops - key) * val
             #print("DEBUG: left=", t)
-            opstates[config.max_ops]=t
+            opstates[config.max_ops+1]=t
             sp_opstates.append(opstates)
-
+            print("DEBUG:Ops=", sp_opstates)
 
         context['species'] = frogspecies
         context['total'] = totals
@@ -712,15 +713,17 @@ class OperationCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.Creat
     raise_exception = True
     permission_required = 'frogs.add_operation'
 
+
     def get_success_url(self):
         frog = Frog.objects.filter(frogid=self.object.frogid)
         return reverse('frogs:frog_detail', args=[frog[0].id])
-
 
     def get_initial(self):
         fid = self.kwargs.get('frogid')
         frog = Frog.objects.get(pk=fid)
         ## next opnum
+        config = SiteConfiguration.objects.get()
+        max = config.max_ops
         opnum = 1 #default
         if (frog.operation_set.all()):
             opnum = frog.operation_set.count() + 1
@@ -961,7 +964,7 @@ class DisposalList(LoginRequiredMixin, generic.ListView):
     raise_exception = True
 
     def get_queryset(self):
-        table = Experiment.objects.order_by('disposal_date')
+        table = Experiment.objects.filter(expt_disposed=True).order_by('-disposal_date')
         #table = DisposalTable(Experiment.objects.order_by('disposal_date'))
         #RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         return table
@@ -979,7 +982,7 @@ class DisposalList(LoginRequiredMixin, generic.ListView):
         if (loc.upper() in qaps):
             qs = qs.filter(expt_location__building=loc.upper())
         table = DisposalTable(qs)
-        RequestConfig(self.request, paginate={"per_page": 2}).configure(table)
+        RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
         context['location'] = loc
         context['loclist'] = sorted(buildings.items())
         context['expts'] = table
@@ -992,7 +995,7 @@ class BulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView
     form_class = BulkExptDisposalForm
     model = Experiment
     raise_exception = True
-    location = 'All'
+    location = 'aaall'
     permission_required = 'frogs.change_experiment'
 
     def get_form_kwargs(self, **kwargs):
@@ -1029,7 +1032,8 @@ class BulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView
         mylist = Experiment.objects.order_by('-disposal_date')
         if self.kwargs.get('location'):
             location = self.kwargs.get('location')
-            if (location != 'all'):
+            #print("DEBUG:location:", location)
+            if (location != 'aaall'):
                 mylist = mylist.filter(expt_location__building=location)
 
         table = ExperimentTable(mylist)
@@ -1042,7 +1046,7 @@ class BulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView
 
 class BulkAutoclave(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
     template_name = 'frogs/experiment/bulkautoclave.html'
-    location = 'All'
+    location = 'aaall' #'All'
     form_class = BulkExptAutoclaveForm
     model = Experiment
     raise_exception = True

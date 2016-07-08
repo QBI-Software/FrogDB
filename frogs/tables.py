@@ -148,14 +148,15 @@ class PermitReportTable(tables.Table):
     qen = tables.Column(footer="Total Frogs:")
     get_totalfrogs = SummingColumn(verbose_name="Shipped/Born")
     frogs_deceased = SummingColumn(verbose_name="Disposed")
-    get_females_remaining = SummingColumn(verbose_name="Remaining (Female)")
-    get_males_remaining = SummingColumn(verbose_name="Remaining (Male)")
+    #frogs_disposed = SummingColumn(verbose_name="Disposed")
+    get_females_remaining = SummingColumn(verbose_name="Live Female")
+    get_males_remaining = SummingColumn(verbose_name="Live Male")
     arrival_date = tables.DateColumn(format='d-M-Y')
 
     class Meta:
         model = Permit
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['aqis','qen', 'arrival_date','get_totalfrogs','frogs_deceased', 'get_females_remaining','get_males_remaining',]
+        fields = ['aqis','qen', 'arrival_date','get_totalfrogs','get_females_remaining','get_males_remaining','frogs_deceased']
 
         order_by_field = 'arrival_date'
         sortable = True

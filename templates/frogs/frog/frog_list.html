@@ -31,7 +31,7 @@
             <a href="{% url 'frogs:frog_create' %}" class="btn btn-info">Create New Frog</a>
             {% endif %}
             {% if table.rows %}
-            {% if perms.frogs.delete_frog %}
+            {% if perms.frogs.change_frog %}
             <a href="{% url 'frogs:bulkfrog_disposal' %}" class="btn btn-success">Dispose Frogs</a></p>
         {% endif %}
         {% render_table table %}

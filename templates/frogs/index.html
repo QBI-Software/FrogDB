@@ -9,20 +9,7 @@
             oocyte harvests and tracking and disposal of all quarantine material.
         </p>
         <p>The Frog database replaces currently handwritten data forms and manually generated reports.</p>
-        <div align="center">
-            <ul class="list-group">
-                <li class="list-group-item"><h3>Reports</h3></li>
 
-                {% if species and user.is_authenticated %}
-                {% for sp in species %}
-                <li class="list-group-item">
-                    <a class="btn btn-primary" href="{% url 'frogs:froglog_report' sp.name %}" class="btn btn-default">{{ sp.name }} Report</a>
-                </li>
-                {% endfor %}
-
-                {% endif %}
-            </ul>
-        </div>
     </div>
 
     <div class="row">
@@ -67,7 +54,7 @@
             <div class="well">
                 <h3>Operations</h3>
                 {% if op_list %}
-                <p>There are currently {{ op_list }} frogs ready for operation.</p>
+                <p>There are {{ op_list }} healthy frogs ready for operation.</p>
                 {% if user.is_authenticated %}
                 <p><a href="{% url 'frogs:operation_summary' %}#all" class="btn btn-warning">View Operations</a>
                 </p>
@@ -79,6 +66,24 @@
             </div>
         </div>
     </div>
+    {% if species and user.is_authenticated %}
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4" align="center">
 
+            <ul class="list-group">
+                <li class="list-group-item"><h3>Reports</h3></li>
+               {% for sp in species %}
+                <li class="list-group-item">
+                    <a class="btn btn-primary" href="{% url 'frogs:froglog_report' sp.name %}" class="btn btn-default">
+                        <i class="glyphicon glyphicon-file"></i> {{ sp.name }} report</a>
+                </li>
+                {% endfor %}
+           </ul>
+
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+ {% endif %}
 </div>
 {% endblock %}
