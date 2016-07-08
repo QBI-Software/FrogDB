@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 urlpatterns = [
+    url(r'^', include('frogs.urls')),
     url(r'^frogs/', include('frogs.urls'), name='frogs'),
     url(r'^admin/', admin.site.urls),
     url(r'^captcha/', include('captcha.urls')),
