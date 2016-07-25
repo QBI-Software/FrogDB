@@ -50,7 +50,7 @@
 		  </ul>
 		  <div class="navbar-right">
             <p>Welcome, {{ user.username }}
-                <a class="btn btn-warning" href="{% url 'admin:password_change' %}">Change password</a>
+                <a class="btn btn-warning" href="{% url 'frogs:password_change' %}">Change password</a>
             <a id="logoutbtn" class="btn btn-success" href="{% url 'frogs:logout' %}">Logout</a></p>
           </div>
         {% else %}
