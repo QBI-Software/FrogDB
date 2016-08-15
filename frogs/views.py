@@ -931,7 +931,8 @@ class ExperimentUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
 
 class ExperimentDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Experiment
-    success_url = reverse_lazy("frogs:experiment_list")
+    template_name = 'frogs/experiment/experiment_confirm_delete.html'
+    success_url = reverse_lazy("frogs:experiment_list_location")
     raise_exception = True
     permission_required = 'frogs.delete_experiment'
 

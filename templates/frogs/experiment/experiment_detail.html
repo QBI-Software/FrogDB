@@ -116,6 +116,7 @@
                 <a class="btn btn-default" href="{% url 'frogs:experiment_delete' expt.id %}">Delete</a>
                 {% endif %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_detail' expt.transferid.operationid.frogid.id %}">View Frog</a>
+                <a class="btn btn-default" href="{% url 'frogs:transfer_detail' expt.transferid.id %}">View Transfer</a>
                 <a class="btn btn-default" onclick="javascript:history.back();return false;">Return</a>
              </div>
         </div>

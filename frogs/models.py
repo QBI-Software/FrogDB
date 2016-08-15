@@ -438,7 +438,7 @@ class Transfer(models.Model):
 
     # Return string with from-to
     def get_verbose(self):
-        verbose = "Frog %s: from operation %d on %s (total %d ml)" % (self.operationid.frogid, self.operationid.opnum, self.operationid.opdate, self.operationid.volume)
+        verbose = "Frog %s: Transfer to %s on %s (total %d ml)" % (self.operationid.frogid, self.transferapproval.tfr_to, self.operationid.opdate, self.operationid.volume)
         return verbose
 
     def clean(self):
@@ -455,7 +455,6 @@ class Experiment(models.Model):
     expt_to = models.DateField("Experiments to")
     expt_location = models.ForeignKey(Qap, verbose_name="Experiment Location", related_name="expt_location")
     expt_disposed = models.BooleanField(_("Disposed"), default=False)
-    #disposal_sentby = models.ForeignKey(User, verbose_name="Disposal sent by",blank=True,null=True)
     disposal_sentby = models.ForeignKey(User, verbose_name="Disposal sent by", related_name="disposal_sentby", blank=True, null=True)
     disposal_date = models.DateField("Disposal date", blank=True,null=True)
     waste_type = models.ForeignKey(Wastetype, verbose_name="Type of waste", blank=True,null=True)
