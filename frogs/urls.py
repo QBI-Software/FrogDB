@@ -135,4 +135,6 @@ urlpatterns = [
         views.DocumentList.as_view(), name='documents_list'),
     url(r'^reports/froglog/(?P<species>[a-zA-Z\.]*)/$',
         views.ReportTableView.as_view(), name="froglog_report"),
+    url(r'^reports/frogreport/(?P<pk>\d+)/$',
+        views.FrogReport.as_view(), name="frog_report"),
     ]

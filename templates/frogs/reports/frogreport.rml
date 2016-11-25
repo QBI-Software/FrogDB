@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
+<!DOCTYPE document SYSTEM "rml.dtd">
+<document filename="FrogReport.pdf">
+ <template pageSize="(21cm, 29.7cm)">
+     <pageTemplate id="main" showBoundary="1">
+		<pageGraphics>
+		    <setFont name="Helvetica-Bold" size="18"/>
+		   <!-- <image file="http://127.0.0.1:8000/static/frogs/img/logo.png" height="50.0" width="200.0" pdfBoxType="MediaBox"/>-->
+		    <drawString x="35" y="783">Xenopus Frog Sheet: {{frog.frogid}}</drawString>
+            <place x="35" y="600" width="250" height="150">
+             <blockTable colWidths="4cm,4cm" showBoundary="yes">
+                 <tr>
+                 <td><para style="colHeader">Frog ID</para></td><td>{{frog.frogid}}</td>
+                 </tr>
+                <tr>
+                 <td><para style="colHeader">Tank Num</para></td><td>{{frog.tankid}}</td>
+                 </tr>
+                  <tr>
+                 <td><para style="colHeader">Gender</para></td><td>{{frog.get_gender_display}}</td>
+                 </tr>
+                  <tr>
+                 <td><para style="colHeader">Species</para></td><td>{{frog.species}}</td>
+                 </tr>
+                 <tr>
+                 <td><para style="colHeader">QEN</para></td><td>{{frog.qen}}</td>
+                 </tr>
+                 </blockTable>
+             </place>
+             {% if frog.dorsalimage.imgfile %}
+             <place x="250" y="570" width="180" height="200">
+             <image file="http://127.0.0.1:8000{{frog.dorsalimage.imgfile.url}}" height="150.0" width="150.0" pdfBoxType="MediaBox"/>
+            <para leftIndent="60">Dorsal</para>
+            </place>
+            {% endif %}
+            {% if frog.ventralimage.imgfile %}
+            <place x="410" y="570" width="180" height="200">
+            <image file="http://127.0.0.1:8000{{frog.ventralimage.imgfile.url}}" height="150.0" width="150.0" pdfBoxType="MediaBox"/>
+            <para leftIndent="60">Ventral</para>
+            </place>
+            {% endif %}
+             <place x="400" y="0" width="200" height="1cm" origin="page" >
+                <para style="footer">Printed on {{printdatetime}}</para>
+            </place>
+
+		</pageGraphics>
+
+		<frame id="ops" x1="5" y1="80" width="580" height="500"/>
+
+	</pageTemplate>
+ </template>
+ <stylesheet>
+     <paraStyle name="style.Title"
+     fontName="Courier-Bold"
+     fontSize="24"
+     leading="36"
+     />
+     <paraStyle name="colHeader" fontName="Helvetica-Bold" fontSize="11" leading="10"/>
+     <paraStyle name="footer" fontName="Helvetica-Bold" fontSize="8" leading="10"/>
+    <blockTableStyle id="plain">
+        <blockFont name="Helvetica"/>
+        <lineStyle kind="GRID" colorName="black"/>
+        <blockBottomPadding length="10"/>
+        <blockTopPadding length="10"/>
+        <blockLeftPadding length="5"/>
+        <blockRightPadding length="5"/>
+    </blockTableStyle>
+
+
+ </stylesheet>
+ <!-- The story starts below this comment -->
+ <story>
+<hr/>
+
+<blockTable colWidths="2.2cm,3cm,3cm,3cm,6cm,2cm" style="plain">
+     <tr>
+     <td><para style="colHeader">Operation Number</para></td>
+     <td><para style="colHeader">Date</para></td>
+     <td><para style="colHeader">Anaesthetic</para></td>
+     <td><para style="colHeader">Oocyte Volume(ml)</para></td>
+     <td><para style="colHeader">Comments</para></td>
+     <td><para style="colHeader">Initials</para></td>
+     </tr>
+
+     {% for op in frog.operation_set.all %}
+         <tr>
+            <td>{{op.opnum}}</td><td>{{op.opdate|date:"d-M-Y"}}</td><td>{{op.anesthetic}}</td><td>{{op.volume}}</td><td>{{op.comments}}</td><td>{{op.initials}}</td>
+        </tr>
+     {% empty %}
+        <tr>
+            <td>0</td><td></td><td></td><td></td><td></td><td></td>
+        </tr>
+     {% endfor %}
+
+
+     </blockTable>
+
+     <spacer length="25"/>
+     <blockTable colWidths="4cm,6cm,3cm" style="plain">
+     <tr>
+     <td><para style="colHeader">Death:</para></td>
+     {% if frog.death.alive %}
+     <td></td><td></td>
+     {% else %}
+     <td>{{frog.death}} ( recorded by {{frog.initials}})</td><td>{{frog.death_date|date:"d-M-Y"}}</td>
+     {% endif %}
+     </tr>
+    <tr>
+     <td><para style="colHeader">Autoclaved:</para></td>
+     {% if frog.disposed %}
+     <td>{{frog.autoclave_date|date:"d-M-Y"}}</td><td>Run #{{frog.autoclave_run}}</td>
+     {% else %}
+     <td></td><td></td>
+     {% endif %}
+     </tr>
+     <tr>
+     <td><para style="colHeader">Incinerated:</para></td>
+     {% if frog.disposed %}
+     <td>{{frog.incineration_date|date:"d-M-Y"}}</td><td></td>
+     {% else %}
+     <td></td><td></td>
+     {% endif %}
+     </tr>
+     <tr>
+     <td><para style="colHeader">Current Location:</para></td><td><para textColor="red">{{frog.current_location}}</para></td><td></td>
+     </tr>
+
+     </blockTable>
+
+ </story>
+
+
+</document>

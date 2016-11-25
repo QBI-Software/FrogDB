@@ -79,7 +79,7 @@ class TransferTable(tables.Table):
 class FrogTable(tables.Table):
     #selectfrog = tables.CheckBoxColumn(accessor='pk')
     frogid = tables.LinkColumn('frogs:frog_detail', args=[A('pk')])
-    get_disposed = tables.Column(verbose_name="Disposed", accessor=A('get_disposed'), orderable=True)
+    get_disposed = tables.Column(verbose_name="Disposed", accessor=A('get_disposed'), orderable=False)
 
     def render_condition(self, value):
         val = bool(value)
@@ -112,7 +112,7 @@ class FilteredSingleTableView(tables.SingleTableView):
     def get_table_data(self):
         data = super(FilteredSingleTableView, self).get_table_data()
         self.filter = self.filter_class(self.request.GET, queryset=data)
-        return self.filter
+        return self.filter.qs
 
     def get_context_data(self, **kwargs):
         context = super(FilteredSingleTableView, self).get_context_data(**kwargs)

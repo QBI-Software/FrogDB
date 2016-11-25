@@ -1,29 +1,28 @@
-import os
-import mimetypes
-from django.shortcuts import get_object_or_404, render, redirect, resolve_url, render_to_response
-from django.db import IntegrityError
-from django.core.urlresolvers import reverse_lazy, reverse, clear_url_caches
-from django.http import HttpResponseRedirect, HttpResponse
-from wsgiref.util import FileWrapper
-from django.views import generic
-from django_tables2 import RequestConfig
-from django.contrib import messages
-from django.utils.http import is_safe_url
-from django.utils.encoding import smart_str
-from django.contrib.auth.forms import AuthenticationForm
+import trml2pdf
+import datetime
+from axes.utils import reset
+from django.conf import settings
+from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout
 from django.contrib.auth import views
-from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.urlresolvers import reverse_lazy, reverse
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect, resolve_url, render_to_response
+from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.views import generic
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView, RedirectView
-from django.conf import settings
-from datetime import date
+from django_tables2 import RequestConfig
 from ipware.ip import get_ip
-from axes.utils import reset
-from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
-from django.template import RequestContext
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 try:
     import urlparse
 except ImportError:
@@ -591,6 +590,35 @@ class FrogBulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.Form
 
     def get_success_url(self):
         return reverse('frogs:frog_list')
+
+class FrogReport(generic.DetailView):
+    model = Frog
+    context_object_name = 'frog'
+    template_name = 'frogs/reports/frogreport.rml'
+    raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        context = super(FrogReport, self).get_context_data(**kwargs)
+        fid = self.kwargs.get('pk')
+        frog = Frog.objects.get(pk=fid)
+        context['name'] = frog.frogid
+        context['pdfname'] = 'FrogReport_%s.pdf' % frog.frogid.rstrip()
+        context['printdatetime'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+        return context
+
+
+    def render_to_response(self, context, **response_kwargs):
+        """Returns PDF as a binary stream."""
+        rml = render_to_string(self.get_template_names(),
+                               self.get_context_data())
+        rml = rml.encode('utf8')
+        #print("DEBUG: rml=",rml)
+
+        # send the response
+        response = HttpResponse(content_type='application/pdf')
+        response.write(trml2pdf.parseString(rml))
+        response['Content-Disposition'] = 'attachment; filename=%s' % context['pdfname']
+        return response
 
 
 ########## OPERATIONS ############################################

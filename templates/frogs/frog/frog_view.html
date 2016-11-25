@@ -82,6 +82,7 @@
                 {% if perms.frogs.add_operation and frog.gender == 'female' and frog.death.name == 'Alive' and frog.operation_set.count < site_config.max_ops %}
                 <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}">Add Operation</a>
                 {% endif %}
+                <a class="btn btn-default" href="{% url 'frogs:frog_report' frog.id %}">PDF</a>
                 {% if perms.frogs.delete_frog %}
                 <a class="btn btn-default" href="{% url 'frogs:frog_delete' frog.id %}">Delete</a>
                 {% endif %}

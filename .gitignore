@@ -5,3 +5,5 @@ frogs/media/*
 frogs/migrations/*
 frogs/static/media/*
 *.sql
+*.py~
+*.rml~

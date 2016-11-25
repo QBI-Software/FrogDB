@@ -322,7 +322,7 @@ class FrogAttachment(models.Model):
             ventral.delete()
         # Only allow images which can be rendered in browser
         ext = self.getextension()
-        valid_extensions = ['.jpf', '.png', '.gif', '.jpeg']
+        valid_extensions = ['.jpg', '.png', '.gif', '.jpeg']
         if not ext.lower() in valid_extensions:
             raise ValidationError(u'Unsupported image type.')
 

@@ -1,10 +1,6 @@
 import django_filters
 
-from .models import Permit, Frog, Transfer, Experiment, Operation, Deathtype
-from django import template
-from datetime import date, timedelta
-from django.forms import DateInput
-from django.contrib.auth.models import User
+from .models import Permit, Frog, Transfer, Experiment
 
 
 class PermitFilter(django_filters.FilterSet):
@@ -49,6 +45,7 @@ class FrogFilter(django_filters.FilterSet):
 
     class Meta:
         model = Frog
+        fields = '__all__'
 
 
 class TransferFilter(django_filters.FilterSet):
@@ -65,6 +62,7 @@ class TransferFilter(django_filters.FilterSet):
 
     class Meta:
         model = Transfer
+        fields = '__all__'
 
 
 
@@ -76,6 +74,7 @@ class ExperimentFilter(django_filters.FilterSet):
 
     class Meta:
         model = Experiment
+        fields = '__all__'
 
 
 ##TODO Custom fields based on calculated fields
@@ -90,5 +89,6 @@ class OperationFilter(django_filters.FilterSet):
 
     class Meta:
         model = Frog
+        fields = '__all__'
         # fields = ['frogid']
         # ,'num_operations','last_operation','next_operation']
