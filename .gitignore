@@ -1,9 +1,12 @@
 *.pyc
 .idea/*
 frogdb/settings.py
+frogdb/settings*
+frogdb/wsgi*
 frogs/media/*
 frogs/migrations/*
 frogs/static/media/*
 *.sql
 *.py~
 *.rml~
+*.gitignore~
