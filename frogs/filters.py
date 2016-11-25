@@ -28,7 +28,7 @@ class FrogFilter(django_filters.FilterSet):
     gender = django_filters.ChoiceFilter(choices=[('', '---------'),
                                                   ('female', 'Female'),
                                                   ('male', 'Male')])
-    alive = django_filters.BooleanFilter(label="Alive", name='death', lookup_expr='alive')
+    death = django_filters.BooleanFilter(label="Alive", name='death', lookup_expr='alive')
 
     death_date = django_filters.DateFromToRangeFilter(label="Death Date (from-to)",
                                                       widget=django_filters.widgets.RangeWidget(
