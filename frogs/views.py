@@ -591,6 +591,7 @@ class FrogBulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.Form
     def get_success_url(self):
         return reverse('frogs:frog_list')
 
+########## PDF REPORTS IN RML ############################################
 class FrogReport(generic.DetailView):
     model = Frog
     context_object_name = 'frog'
@@ -613,6 +614,50 @@ class FrogReport(generic.DetailView):
                                self.get_context_data())
         rml = rml.encode('utf8')
         #print("DEBUG: rml=",rml)
+
+        # send the response
+        response = HttpResponse(content_type='application/pdf')
+        response.write(trml2pdf.parseString(rml))
+        response['Content-Disposition'] = 'attachment; filename=%s' % context['pdfname']
+        return response
+
+
+class SpeciesReport(generic.DetailView):
+    model = Species
+    context_object_name = 'species'
+    template_name = 'frogs/reports/speciesreport.rml'
+    raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        context = super(SpeciesReport, self).get_context_data(**kwargs)
+        sp = self.kwargs.get('species')
+        species = Species.objects.filter(name=sp)[0]
+        config = SiteConfiguration.objects.get()
+        limit = config.notes_limit
+        notes_qs = Notes.objects.filter(notes_species=species).order_by('-note_date')[:limit]
+        locations = []
+        for loc in Location.objects.all():
+            if (Frog.objects.filter(species=species).filter(current_location=loc).count() > 0):
+                locations.append(loc)
+        context['pdfname'] = 'QBIXenopusRegister_%s.pdf' % species.name.rstrip()
+        context['printdatetime'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+        table = PermitReportTable(self.get_queryset())
+        RequestConfig(self.request).configure(table)
+        context['species'] = species.name
+        context['frognotes_table'] = notes_qs
+        context['generalnotes'] = species.generalnotes
+        context['table'] = table
+        context['locations'] = locations
+        context['genders'] =['female','male']
+        context['frogs_table']= Frog.objects.filter(species=species).order_by('frogid')
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        """Returns PDF as a binary stream."""
+        rml = render_to_string(self.get_template_names(),
+                               self.get_context_data())
+        rml = rml.encode('utf8')
+        # print("DEBUG: rml=",rml)
 
         # send the response
         response = HttpResponse(content_type='application/pdf')

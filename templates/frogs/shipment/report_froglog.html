@@ -12,6 +12,7 @@
         {% if site_config.aec %}
         <div class="report-aec">AEC: {{ site_config.aec|force_escape }}</div>
         {% endif %}
+        <div align="right"><a class="btn btn-default" href="{% url 'frogs:species_report' species %}">PDF</a></div>
     </div>
 
     <div class="panel panel-success">

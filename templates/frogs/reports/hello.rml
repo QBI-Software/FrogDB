@@ -1,0 +1,26 @@
+<!DOCTYPE document SYSTEM "rml.dtd">
+<document filename="hello.pdf">
+    
+    <template showBoundary="0">
+        <!--define a 'frame' into which the content will flow.-->
+        <pageTemplate id="main">
+             <frame id="first" x1="50" y1="200" width="450" height="300"/>
+        </pageTemplate>
+    </template>
+  
+    <stylesheet>
+        <!-- define a text style -->
+        <paraStyle name="textstyle1" fontName="Helvetica" fontSize="24" leading="24" />
+    </stylesheet>
+  
+    <story>
+       <!--The elements in this section will fill up the frames -->
+       <!--defined in the <template> section above.             -->
+       <!--The text inside double hashes is replaced dynamically-->
+       <!--inside Default.aspx-->
+        <para style="textstyle1">
+             Welcome <b>{{name}}</b>, to the world of RML!
+        </para>
+        
+    </story>
+</document>

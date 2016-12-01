@@ -137,4 +137,6 @@ urlpatterns = [
         views.ReportTableView.as_view(), name="froglog_report"),
     url(r'^reports/frogreport/(?P<pk>\d+)/$',
         views.FrogReport.as_view(), name="frog_report"),
+    url(r'^reports/speciesreport/(?P<species>[a-zA-Z\.]*)/$',
+        views.SpeciesReport.as_view(), name="species_report"),
     ]

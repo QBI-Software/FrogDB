@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
+<!DOCTYPE document SYSTEM "rml.dtd">
+<document filename="QBIXenopusRegister.pdf">
+ <template pageSize="(21cm, 29.7cm)">
+     <pageTemplate id="main" showBoundary="1">
+		<pageGraphics>
+		    <setFont name="Helvetica-Bold" size="18"/>
+		    <image file="{% static "frogs/img/logo.png" %}" align="left"  alt="QBI, The University of Queensland" height="50.0" width="200.0" pdfBoxType="MediaBox"/>
+		    <drawString x="35" y="783">{{ species }} Quarantine Register</drawString>
+            <place x="35" y="600" width="250" height="150">
+                <para style="report-header">Quarantine Sample Register<br/>Declared pest species - Log<br/>University of Queensland
+        </para>
+        <para style="report-title">{{ species }}</para>
+        <para style="report-location">{{ site_config.report_location|force_escape }}</para>
+        <para style="report-aec">AEC: {{ site_config.aec|force_escape }}</para>
+            </place>
+        </pageGraphics>
+     </pageTemplate>
+ </template>
+    <stylesheet>
+     <paraStyle name="style.Title"
+     fontName="Courier-Bold"
+     fontSize="24"
+     leading="36"
+     />
+     <paraStyle name="report-header" fontName="Helvetica-Bold" fontSize="11" leading="10"/>
+        <paraStyle name="report-title" fontName="Helvetica" fontSize="11" leading="10"/>
+        <paraStyle name="report-location" fontName="Helvetica" fontSize="10" leading="10"/>
+        <paraStyle name="report-aec" fontName="Helvetica" fontSize="10" fontColor="red" leading="10"/>
+     <paraStyle name="footer" fontName="Helvetica-Bold" fontSize="8" leading="10"/>
+    </stylesheet>
+    <story></story>
+</document>
