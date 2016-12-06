@@ -30,7 +30,7 @@ def get_initials_from_user(uname):
 class SiteConfiguration(SingletonModel):
     site_name = models.CharField(max_length=255, default='Site Name')
     report_location = models.CharField(max_length=1000, default='Location')
-    report_contact_details = models.CharField(max_length=2000, default='Contact Details')
+    report_contact_details = models.CharField(max_length=10000, default='Contact Details')
     #report_general_notes = models.CharField(max_length=5000, default='General Notes')
     maintenance_mode = models.BooleanField(default=False)
     max_ops = models.SmallIntegerField(_("Max operations"), default=6)

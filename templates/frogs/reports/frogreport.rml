@@ -28,18 +28,18 @@
              </place>
              {% if frog.dorsalimage.imgfile %}
              <place x="250" y="570" width="180" height="200">
-             <image file="http://127.0.0.1:8000{{frog.dorsalimage.imgfile.url}}" height="150.0" width="150.0" pdfBoxType="MediaBox"/>
+             <image file="{{hostname}}{{frog.dorsalimage.imgfile.url}}" height="150.0" width="150.0" pdfBoxType="MediaBox"/>
             <para leftIndent="60">Dorsal</para>
             </place>
             {% endif %}
             {% if frog.ventralimage.imgfile %}
             <place x="410" y="570" width="180" height="200">
-            <image file="http://127.0.0.1:8000{{frog.ventralimage.imgfile.url}}" height="150.0" width="150.0" pdfBoxType="MediaBox"/>
+            <image file="{{hostname}}{{frog.ventralimage.imgfile.url}}" height="150.0" width="150.0" pdfBoxType="MediaBox"/>
             <para leftIndent="60">Ventral</para>
             </place>
             {% endif %}
-             <place x="400" y="0" width="200" height="1cm" origin="page" >
-                <para style="footer">Printed on {{printdatetime}}</para>
+             <place x="300" y="0" width="200" height="1cm" origin="page" >
+                <para style="footer">{{hostname}}: Printed on {{printdatetime}}</para>
             </place>
 
 		</pageGraphics>
@@ -69,7 +69,6 @@
  </stylesheet>
  <!-- The story starts below this comment -->
  <story>
-<hr/>
 
 <blockTable colWidths="2.2cm,3cm,3cm,3cm,6cm,2cm" style="plain">
      <tr>

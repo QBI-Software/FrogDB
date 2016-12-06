@@ -592,7 +592,7 @@ class FrogBulkDisposal(LoginRequiredMixin, PermissionRequiredMixin, generic.Form
         return reverse('frogs:frog_list')
 
 ########## PDF REPORTS IN RML ############################################
-class FrogReport(generic.DetailView):
+class FrogReport(LoginRequiredMixin, generic.DetailView):
     model = Frog
     context_object_name = 'frog'
     template_name = 'frogs/reports/frogreport.rml'
@@ -602,6 +602,7 @@ class FrogReport(generic.DetailView):
         context = super(FrogReport, self).get_context_data(**kwargs)
         fid = self.kwargs.get('pk')
         frog = Frog.objects.get(pk=fid)
+        context['hostname'] = 'http://%s' % self.request.get_host()
         context['name'] = frog.frogid
         context['pdfname'] = 'FrogReport_%s.pdf' % frog.frogid.rstrip()
         context['printdatetime'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
@@ -621,8 +622,33 @@ class FrogReport(generic.DetailView):
         response['Content-Disposition'] = 'attachment; filename=%s' % context['pdfname']
         return response
 
+###RML Parser helper - hack unfortunately to handle embedded html TODO: Another method to reformat html
+def rml_html_clean(para):
+    from bs4 import BeautifulSoup
 
-class SpeciesReport(generic.DetailView):
+    soup = BeautifulSoup(para, 'html.parser')
+    print("text:", soup.get_text())
+    parts = [text.replace('\xa0', '') for text in soup.stripped_strings]
+    p = []
+    t0 =0
+    for i,t in enumerate(parts):
+        #print('DEBUG: SEARCH: ', t)
+        if t[-1] =='(':
+            t0 = 1 #append next
+        elif t0:
+            #print('DEBUG: matched: ', t)
+            t = parts[i-1] + t + parts[i+1]
+            p.append(t)
+            t0 = 0
+        elif t != ')':
+            p.append(t)
+            t0 = 0
+    #print("DEBUG:", p)
+    return p;
+
+
+
+class SpeciesReport(LoginRequiredMixin, generic.TemplateView):
     model = Species
     context_object_name = 'species'
     template_name = 'frogs/reports/speciesreport.rml'
@@ -630,26 +656,29 @@ class SpeciesReport(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(SpeciesReport, self).get_context_data(**kwargs)
-        sp = self.kwargs.get('species')
-        species = Species.objects.filter(name=sp)[0]
+        species = self.kwargs.get('species')
+        sp = Species.objects.get(name=species)
         config = SiteConfiguration.objects.get()
         limit = config.notes_limit
-        notes_qs = Notes.objects.filter(notes_species=species).order_by('-note_date')[:limit]
+        notes_qs = Notes.objects.filter(notes_species=sp).order_by('-note_date')[:limit]
         locations = []
         for loc in Location.objects.all():
-            if (Frog.objects.filter(species=species).filter(current_location=loc).count() > 0):
+            if (Frog.objects.filter(species=sp).filter(current_location=loc).count() > 0):
                 locations.append(loc)
-        context['pdfname'] = 'QBIXenopusRegister_%s.pdf' % species.name.rstrip()
+        context['pdfname'] = 'QBIXenopusRegister_%s.pdf' % species.rstrip()
         context['printdatetime'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-        table = PermitReportTable(self.get_queryset())
+        table = PermitReportTable(Permit.objects.filter(species=sp))
         RequestConfig(self.request).configure(table)
-        context['species'] = species.name
+        context['hostname'] = 'http://%s' % self.request.get_host()
+        context['species'] = species
+        context['config'] = config
+        context['contacts'] = rml_html_clean(config.report_contact_details)
         context['frognotes_table'] = notes_qs
-        context['generalnotes'] = species.generalnotes
+        context['generalnotes'] = sp.generalnotes
         context['table'] = table
         context['locations'] = locations
         context['genders'] =['female','male']
-        context['frogs_table']= Frog.objects.filter(species=species).order_by('frogid')
+        context['frogs_table']= Frog.objects.filter(species=sp).order_by('frogid')
         return context
 
     def render_to_response(self, context, **response_kwargs):
