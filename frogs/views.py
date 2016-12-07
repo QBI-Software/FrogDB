@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView, RedirectView
 from django_tables2 import RequestConfig
+from django.db.models import Sum
 from ipware.ip import get_ip
 
 try:
@@ -667,15 +668,25 @@ class SpeciesReport(LoginRequiredMixin, generic.TemplateView):
                 locations.append(loc)
         context['pdfname'] = 'QBIXenopusRegister_%s.pdf' % species.rstrip()
         context['printdatetime'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-        table = PermitReportTable(Permit.objects.filter(species=sp))
-        RequestConfig(self.request).configure(table)
+        permits = Permit.objects.filter(species=sp)
+        totals = Permit.objects.filter(species=sp).aggregate(Sum('females'), Sum('males'))
+        totals['total'] = totals['females__sum'] + totals['males__sum']
+        totals['females_remain'] =0
+        totals['males_remain'] = 0
+        totals['disposed'] = 0
+        for p in permits:
+            totals['females_remain'] += p.get_females_remaining()
+            totals['males_remain'] += p.get_males_remaining()
+            totals['disposed'] += p.frogs_disposed()
+
         context['hostname'] = 'http://%s' % self.request.get_host()
         context['species'] = species
         context['config'] = config
         context['contacts'] = rml_html_clean(config.report_contact_details)
         context['frognotes_table'] = notes_qs
         context['generalnotes'] = sp.generalnotes
-        context['table'] = table
+        context['permits'] = permits
+        context['totals'] = totals
         context['locations'] = locations
         context['genders'] =['female','male']
         context['frogs_table']= Frog.objects.filter(species=sp).order_by('frogid')

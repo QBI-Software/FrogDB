@@ -71,10 +71,7 @@
                     <th>Date of arrival</th>
                     <th>QEN</th>
                     <th>Gender</th>
-                    {% if 'Disposed' in loc.name %}
-                    <th>Disposal Method</th>
-                    <th>Disposal Date</th>
-                    {% endif %}
+                    <th style="width:160px;">Disposal</th>
                     {% if gender == 'female' %}
                     <th>Operation Details</th>
                     {% endif %}
@@ -91,12 +88,11 @@
                     <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
                     <td>{{frog.qen}}</td>
                     <td>{{frog.gender}}</td>
-                    {% if 'Disposed' in loc.name %}
                     <td>{{frog.death.name}}
                         {% if frog.disposed %}
                         on {{frog.death_date|date:"d-M-Y"}}
                         {% if frog.autoclave_run %}
-                        autoclaved (Run#{{frog.autoclave_run}})
+                        autoclaved ({{frog.autoclave_date|date:"d-M-Y"}} Run#{{frog.autoclave_run}})
                         {% if frog.incineration_date %}
                         and incinerated
                         {% endif %}
@@ -104,8 +100,7 @@
                         {% endif %}
 
                     </td>
-                    <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
-                    {% endif %}
+
                     {% if gender == 'female' %}
                     <td>
                         <table class="table-condensed">

@@ -22,6 +22,15 @@
                  <td><para style="colHeader">Species</para></td><td>{{frog.species}}</td>
                  </tr>
                  <tr>
+                 <td><para style="colHeader">Status</para></td><td>{{frog.death.name}}</td>
+                 </tr>
+                 <tr>
+                 <td><para style="colHeader">Condition</para></td><td>{% if frog.condition %}Poorly{%else%}Well{%endif%}</td>
+                 </tr>
+                 <tr>
+                 <td><para style="colHeader">Remarks</para></td><td>{{frog.remarks}}</td>
+                 </tr>
+                 <tr>
                  <td><para style="colHeader">QEN</para></td><td>{{frog.qen}}</td>
                  </tr>
                  </blockTable>
@@ -55,6 +64,8 @@
      leading="36"
      />
      <paraStyle name="colHeader" fontName="Helvetica-Bold" fontSize="11" leading="10"/>
+     <paraStyle name="heading" fontName="Helvetica-Bold" fontSize="14" leading="36"
+                textColor="#5d6e89" spaceBefore="10" leftIndent="10"/>
      <paraStyle name="footer" fontName="Helvetica-Bold" fontSize="8" leading="10"/>
     <blockTableStyle id="plain">
         <blockFont name="Helvetica"/>
@@ -70,6 +81,7 @@
  <!-- The story starts below this comment -->
  <story>
 
+<para style="heading">Operation Details</para>
 <blockTable colWidths="2.2cm,3cm,3cm,3cm,6cm,2cm" style="plain">
      <tr>
      <td><para style="colHeader">Operation Number</para></td>
@@ -94,7 +106,8 @@
      </blockTable>
 
      <spacer length="25"/>
-     <blockTable colWidths="4cm,6cm,3cm" style="plain">
+     <para style="heading">Disposal Details</para>
+     <blockTable colWidths="5cm,8cm,4cm" style="plain">
      <tr>
      <td><para style="colHeader">Death:</para></td>
      {% if frog.death.alive %}

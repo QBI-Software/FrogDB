@@ -6,16 +6,14 @@
             <pageGraphics>
                 <setFont name="Helvetica" size="8"/>
                 <place x="1.5cm" y="25cm" width="9cm" height="3cm">
-
-                    <!--<illustration width="150" height="50" align="LEFT">
-                            <image file="{{hostname}}/static/frogs/img/logo.png" pdfBoxType="MediaBox"/>
-                    </illustration>-->
+                   <!-- <image file="{{hostname}}/static/frogs/img/logo.png"
+                           height="50" width="100" x="35" y="0" pdfBoxType="MediaBox"/>-->
                     <para style="report-text">
                         Quarantine Sample Register<br/>
                         Declared pest species - Log<br/>
                         University of Queensland
                     </para>
-                    <spacer length="15"/>
+                    <spacer length="10"/>
                     <title>{{ species }}</title>
 
                 </place>
@@ -23,7 +21,7 @@
                 <para style="footer">{{hostname}}: Printed on {{printdatetime}}</para>
             </place>
             </pageGraphics>
-            <frame id="ops" x1="5" y1="35" width="580" height="700"/>
+            <frame id="ops" x1="5" y1="35" width="580" height="650"/>
 
         </pageTemplate>
     </template>
@@ -33,13 +31,24 @@
                    fontSize="32"
                    leading="10"
         />
-        <paraStyle name="report-text" fontName="Helvetica" fontSize="10" leading="10" spaceAfter="12"/>
+        <paraStyle name="report-text" fontName="Helvetica" fontSize="10" leading="15" spaceAfter="15" alignment="left"/>
+        <paraStyle name="small-text" fontName="Helvetica" fontSize="9" leading="10" spaceAfter="12"/>
+        <paraStyle name="indent-text" fontName="Helvetica" fontSize="10" leading="10" spaceAfter="12" leftIndent="20"/>
         <paraStyle name="report-location" fontName="Helvetica-Bold" fontSize="10" leading="10" alignment="center"/>
         <paraStyle name="report-aec" fontName="Helvetica" fontSize="10" leading="10" alignment="center"/>
-        <paraStyle name="colHeader" fontName="Helvetica-Bold" fontSize="11" leading="10" />
-        <paraStyle name="colHeader2" fontName="Helvetica-Bold" fontSize="10" leading="10" spaceAfter="12"/>
+        <paraStyle name="colHeader" fontName="Helvetica-Bold" fontSize="10" leading="10" />
+        <paraStyle name="colHeader2" fontName="Helvetica-Bold" fontSize="9" leading="10" spaceAfter="12"/>
+        <paraStyle name="heading" fontName="Helvetica-Bold" fontSize="14" leading="36"
+                textColor="#5d6e89" spaceBefore="10" leftIndent="10"/>
         <paraStyle name="footer" fontName="Helvetica-Bold" fontSize="8" leading="10"/>
-
+        <paraStyle name="panel" spaceBefore="10" leftIndent="10" leading="10" spaceAfter="12"
+            fontName="Helvetica"
+            fontSize="10"
+            borderWidth="1"
+            borderColor="#d6e9c6"
+            borderRadius="5"
+            borderPadding="3"
+            />
         <blockTableStyle id="realplain">
             <blockFont name="Helvetica" size="8"/>
             <blockBottomPadding length="2"/>
@@ -49,11 +58,21 @@
         </blockTableStyle>
         <blockTableStyle id="plain">
             <blockFont name="Helvetica"/>
-            <lineStyle kind="GRID" colorName="gray"/>
+            <lineStyle kind="GRID" colorName="#e3e3e3"/>
             <blockBottomPadding length="5"/>
             <blockTopPadding length="5"/>
             <blockLeftPadding length="5"/>
             <blockRightPadding length="5"/>
+            <blockBottomPadding length="10"  start="0,0" stop="-1,0"/>
+            <blockTopPadding length="10" start="0,0" stop="-1,0"/>
+            <blockBackground colorName="#f5f5f5" start="0,0" stop="-1,0"/>
+            <blockFont name="Helvetica" colorName="#337ab7" start="0,0" stop="-1,0"/>
+        </blockTableStyle>
+        <blockTableStyle id="plaintotal" parent="plain">
+            <lineStyle kind="LINEABOVE" colorName="purple" start="0,0" stop="-1,0"/>
+            <lineStyle kind="LINEBELOW" colorName="purple" start="0,0" stop="-1,0" dash="2,2" cap="butt"/>
+            <lineStyle kind="LINEABOVE" colorName="purple" start="0,-1" stop="-1,-1"/>
+            <lineStyle kind="LINEBELOW" colorName="purple" start="0,-1" stop="-1,-1" count="2"/>
         </blockTableStyle>
         <blockTableStyle id="small">
             <blockFont name="Helvetica" size="8"/>
@@ -79,18 +98,59 @@
                 {% if ':' in con %}
                 <para style="colHeader2">{{ con }}</para>
                 {%else %}
-                <para style="report-text">{{ con }}</para>
+                <para style="indent-text">{{ con }}</para>
                 {% endif %}
             </td>
             </tr>
             {% endfor %}
         </blockTable>
         <spacer length="25"/>
+         <blockTable colWidths="2.5cm,3cm,3cm,3cm,2.5cm,2.5cm,2.5cm" style="plaintotal">
+            <tr>
+                <td>
+                    <para style="colHeader">AQIS</para>
+                </td>
+                <td>
+                    <para style="colHeader">QEN</para>
+                </td>
+                <td>
+                    <para style="colHeader">Arrival Date</para>
+                </td>
+                <td>
+                    <para style="colHeader">Shipped/Born</para>
+                </td>
+                <td>
+                    <para style="colHeader">Live Female</para>
+                </td>
+                <td>
+                    <para style="colHeader">Live Male</para>
+                </td>
+                <td>
+                    <para style="colHeader">Disposed</para>
+                </td>
+            </tr>
 
+            {% for permit in permits %}
+            <tr>
+                <td vAlign="top">{{permit.aqis}}</td>
+                <td vAlign="top">{{permit.qen}}</td>
+                <td vAlign="top">{{permit.arrival_date|date:"d-M-Y"}}</td>
+                <td vAlign="top">{{permit.get_totalfrogs|force_escape}}</td>
+                <td vAlign="top">{{permit.get_females_remaining|force_escape}}</td>
+                <td vAlign="top">{{permit.get_males_remaining|force_escape}}</td>
+                <td vAlign="top">{{permit.frogs_disposed|force_escape}}</td>
+            </tr>
+            {% endfor %}
+             <tr style="totalrow">
+                 <td></td><td></td><td style="colHeader2">TOTAL FROGS</td><td>{{totals.total}}</td>
+                 <td>{{totals.females_remain}}</td><td>{{totals.males_remain}}</td><td>{{totals.disposed}}</td></tr>
+
+        </blockTable>
 
         <spacer length="25"/>
-        <para style="report-aec">{{ generalnotes|safe }}</para>
+        <para style="panel">{{ generalnotes|safe }}</para>
         <spacer length="25"/>
+        {% if frognotes_table %}
         <blockTable colWidths="5cm,11.2cm,3cm" style="plain">
             <tr>
                 <td>
@@ -113,9 +173,10 @@
             {% endfor %}
 
         </blockTable>
+        {% endif %}
 
         <spacer length="25"/>
-        <blockTable colWidths="2.2cm,2cm,3cm,2cm,2cm,2cm,2cm, 4cm" style="plain">
+        <blockTable colWidths="2.2cm,2cm,3cm,2cm,2cm,4cm,4cm" style="plain">
             <tr>
 
                 <td>
@@ -135,11 +196,9 @@
                 </td>
 
                 <td>
-                    <para style="colHeader">Disposal Method</para>
+                    <para style="colHeader">Disposal</para>
                 </td>
-                <td>
-                    <para style="colHeader">Disposal Date</para>
-                </td>
+
                 <td>
                     <para style="colHeader">Operations</para>
                 </td>
@@ -149,31 +208,26 @@
 
             {% for frog in frogs_table %}
             {% if frog.species.name == species %}
-            <tr>
+            <tr background="{{frog.qen.color}}">
                 <td>{{frog.frogid}}</td>
                 <td>{{frog.qen.supplier.name}}</td>
                 <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
                 <td>{{frog.qen}}</td>
                 <td>{{frog.gender}}</td>
-                {% if 'Disposed' in loc.name %}
-                <td>{{frog.death.name}}
-                    {% if frog.disposed %}
-                    on {{frog.death_date|date:"d-M-Y"}}
-                    {% if frog.autoclave_run %}
-                    autoclaved (Run#{{frog.autoclave_run}})
-                    {% if frog.incineration_date %}
-                    and incinerated
-                    {% endif %}
-                    {% endif %}
-                    {% endif %}
-
+                <td><para style="small-text">{{frog.death.name}}
+{% if frog.disposed %}
+ on {{frog.death_date|date:"d-M-Y"}}
+{% if frog.autoclave_run %}
+ autoclaved (Run#{{frog.autoclave_run}} on {{frog.autoclave_date|date:"d-M-Y"}})
+{% if frog.incineration_date %} and incinerated
+{% endif %}
+                        {% endif %}
+                    {% endif %}</para>
                 </td>
-                <td>{{frog.autoclave_date|date:"d-M-Y"}}</td>
-                {% else %}
-                <td></td>
-                <td></td>
-                {% endif %}
+
+
                 <td>
+                    {% if frog.operation_set.all %}
                     <blockTable colWidths="0.8cm,1cm,2cm" style="realplain">
                         <tr>
                                 <td>No</td>
@@ -191,6 +245,9 @@
 
                             {% endfor %}
                     </blockTable>
+                    {% else %}
+                    <para style="small-text">No operations performed</para>
+                    {% endif %}
                 </td>
 
             </tr>

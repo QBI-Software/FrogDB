@@ -33,8 +33,12 @@ footer p{
     color:#5cb85c !important;
 }
 
+a.dropdown-toggle:focus {
+    color:#5cb85c !important;
+}
 .dropdown-menu{
     background-color: #5CB85C;
+
     }
 
 /* Form layout */
