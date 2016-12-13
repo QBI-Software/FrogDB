@@ -626,7 +626,7 @@ class FrogReport(LoginRequiredMixin, generic.DetailView):
 ###RML Parser helper - hack unfortunately to handle embedded html TODO: Another method to reformat html
 def rml_html_clean(para, splittext=True):
     from bs4 import BeautifulSoup
-    invalid_tags = ['span', 'sup', 'u']
+    invalid_tags = ['span', 'sup', 'u', 'em']
     soup = BeautifulSoup(para, "html5lib")
     for tag in invalid_tags:
         for match in soup.findAll(tag):
