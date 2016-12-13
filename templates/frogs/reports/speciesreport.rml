@@ -182,7 +182,7 @@
         <spacer length="5"/>
 
         {% if frognotes_table %}
-        <blockTable colWidths="3cm,14cm,2cm" style="plain" repeatRows="1">
+        <blockTable colWidths="3cm,14cm,2cm" style="plain2" repeatRows="1">
             <tr>
                 <td>
                     <para style="colHeader">Date</para>
@@ -209,7 +209,7 @@
         <spacer length="25"/>
         {% for loc in locations %}
         <para style="panel-heading">{{ loc.name|force_escape }}</para>
-        <blockTable colWidths="2.2cm,2cm,3cm,2cm,2cm,4cm,4cm" style="plain" repeatRows="1">
+        <blockTable colWidths="2cm,2cm,3cm,2.2cm,2cm,4cm,4cm" style="plain" repeatRows="1">
             <tr>
 
                 <td>
