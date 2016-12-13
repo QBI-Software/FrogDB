@@ -243,11 +243,11 @@
 
             {% if frog.species.name == species and frog.current_location == loc %}
             <tr background="{{frog.qen.color}}">
-                <td>{{frog.frogid}}</td>
-                <td>{{frog.qen.supplier.name}}</td>
-                <td>{{frog.qen.arrival_date|date:"d-M-Y"}}</td>
-                <td>{{frog.qen}}</td>
-                <td>{{frog.gender}}</td>
+                <td><para style="small-text">{{frog.frogid}}</para></td>
+                <td><para style="small-text">{{frog.qen.supplier.name}}</para></td>
+                <td><para style="small-text">{{frog.qen.arrival_date|date:"d-M-Y"}}</para></td>
+                <td><para style="small-text">{{frog.qen}}</para></td>
+                <td><para style="small-text">{{frog.gender}}</para></td>
                 <td><para style="small-text">{{frog.death.name}}
 {% if frog.disposed %}
  on {{frog.death_date|date:"d-M-Y"}}
