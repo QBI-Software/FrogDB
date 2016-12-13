@@ -124,6 +124,7 @@
             {% endfor %}
         </blockTable>
         <spacer length="25"/>
+        <para style="colHeader">Shipments</para>
          <blockTable colWidths="2.5cm,3cm,3cm,3cm,2.5cm,2.5cm,2.5cm" style="plaintotal">
             <tr>
                 <td>
@@ -181,7 +182,7 @@
         <spacer length="5"/>
 
         {% if frognotes_table %}
-        <blockTable colWidths="5cm,11.2cm,3cm" style="plain">
+        <blockTable colWidths="5cm,12cm,2cm" style="plain">
             <tr>
                 <td>
                     <para style="colHeader">Date</para>
@@ -196,9 +197,9 @@
 
             {% for note in frognotes_table %}
             <tr>
-                <td>{{note.note_date|date:"d-M-Y"}}</td>
-                <td>{{note.notes|force_escape}}</td>
-                <td>{{note.initials|force_escape}}</td>
+                <td><para style="small-text">{{note.note_date|date:"d-M-Y"}}</para></td>
+                <td><para style="small-text">{{note.notes|force_escape}}</para></td>
+                <td><para style="small-text">{{note.initials|force_escape}}</para></td>
             </tr>
             {% endfor %}
 
