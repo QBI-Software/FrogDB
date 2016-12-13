@@ -624,28 +624,39 @@ class FrogReport(LoginRequiredMixin, generic.DetailView):
         return response
 
 ###RML Parser helper - hack unfortunately to handle embedded html TODO: Another method to reformat html
-def rml_html_clean(para):
+def rml_html_clean(para, splittext=True):
     from bs4 import BeautifulSoup
+    invalid_tags = ['span', 'sup', 'u']
+    soup = BeautifulSoup(para, "html5lib")
+    for tag in invalid_tags:
+        for match in soup.findAll(tag):
+            match.replaceWithChildren()
 
-    soup = BeautifulSoup(para, 'html.parser')
-    #print("text:", soup.get_text())
-    parts = [text.replace('\xa0', '') for text in soup.stripped_strings]
+    print('DEBUG: soup=', soup)
     p = []
-    t0 =0
-    for i,t in enumerate(parts):
-        #print('DEBUG: SEARCH: ', t)
-        if t[-1] =='(':
-            t0 = 1 #append next
-        elif t0:
-            #print('DEBUG: matched: ', t)
-            t = parts[i-1] + t + parts[i+1]
-            p.append(t)
-            t0 = 0
-        elif t != ')':
-            p.append(t)
-            t0 = 0
-    #print("DEBUG:", p)
-    return p;
+    if splittext:
+        parts = [text.replace('\xa0', '') for text in soup.stripped_strings]
+        print("parts:", parts)
+
+        t0 =0
+        for i,t in enumerate(parts):
+            #print('DEBUG: SEARCH: ', t)
+            if t[-1] =='(':
+                t0 = 1 #append next
+            elif t0:
+                #print('DEBUG: matched: ', t)
+                t = parts[i-1] + t + parts[i+1]
+                p.append(t)
+                t0 = 0
+            elif t != ')':
+                p.append(t)
+                t0 = 0
+    else:
+        p = soup.get_text()
+        p = p.split("\n\n")
+    print("DEBUG:rml_clean=", p)
+
+    return p
 
 
 
@@ -670,6 +681,10 @@ class SpeciesReport(LoginRequiredMixin, generic.TemplateView):
         context['printdatetime'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
         permits = Permit.objects.filter(species=sp)
         totals = Permit.objects.filter(species=sp).aggregate(Sum('females'), Sum('males'))
+        if (totals['females__sum'] is None):
+            totals['females__sum'] = 0
+        if (totals['males__sum'] is None):
+            totals['males__sum'] = 0
         totals['total'] = totals['females__sum'] + totals['males__sum']
         totals['females_remain'] =0
         totals['males_remain'] = 0
@@ -684,7 +699,7 @@ class SpeciesReport(LoginRequiredMixin, generic.TemplateView):
         context['config'] = config
         context['contacts'] = rml_html_clean(config.report_contact_details)
         context['frognotes_table'] = notes_qs
-        context['generalnotes'] = sp.generalnotes
+        context['generalnotes'] = rml_html_clean(sp.generalnotes, False)
         context['permits'] = permits
         context['totals'] = totals
         context['locations'] = locations

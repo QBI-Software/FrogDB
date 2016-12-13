@@ -32,8 +32,8 @@
                    leading="10"
         />
         <paraStyle name="report-text" fontName="Helvetica" fontSize="10" leading="15" spaceAfter="15" alignment="left"/>
-        <paraStyle name="small-text" fontName="Helvetica" fontSize="9" leading="10" spaceAfter="12"/>
-        <paraStyle name="indent-text" fontName="Helvetica" fontSize="10" leading="10" spaceAfter="12" leftIndent="20"/>
+        <paraStyle name="small-text" fontName="Helvetica" fontSize="8" leading="10" spaceAfter="12"/>
+        <paraStyle name="indent-text" fontName="Helvetica" fontSize="9" leading="10" spaceAfter="12" leftIndent="20"/>
         <paraStyle name="report-location" fontName="Helvetica-Bold" fontSize="10" leading="10" alignment="center"/>
         <paraStyle name="report-aec" fontName="Helvetica" fontSize="10" leading="10" alignment="center"/>
         <paraStyle name="colHeader" fontName="Helvetica-Bold" fontSize="10" leading="10" />
@@ -71,6 +71,19 @@
             <blockBackground colorName="#f5f5f5" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica" colorName="#337ab7" start="0,0" stop="-1,0"/>
         </blockTableStyle>
+        <blockTableStyle id="plain1" parent="plain">
+            <blockBackground colorName="#d6e9c6" start="0,0" stop="-1,0"/>
+            <lineStyle kind="OUTLINE" colorName="#d6e9c6" thickness="0.5"/>
+            <blockBottomPadding length="10"  start="0,0" stop="-1,0"/>
+            <blockTopPadding length="10" start="0,0" stop="-1,0"/>
+        </blockTableStyle>
+        <blockTableStyle id="plain2" parent="plain">
+            <blockBackground colorName="#faebcc" start="0,0" stop="-1,0"/>
+            <lineStyle kind="OUTLINE" colorName="#faebcc" thickness="0.5"/>
+            <blockBottomPadding length="10"  start="0,0" stop="-1,0"/>
+            <blockTopPadding length="10" start="0,0" stop="-1,0"/>
+            <lineStyle kind="GRID" colorName="#faebcc"/>
+        </blockTableStyle>
         <blockTableStyle id="plaintotal" parent="plain">
             <lineStyle kind="LINEABOVE" colorName="purple" start="0,0" stop="-1,0"/>
             <lineStyle kind="LINEBELOW" colorName="purple" start="0,0" stop="-1,0" dash="2,2" cap="butt"/>
@@ -93,9 +106,13 @@
 
 
         <spacer length="6"/>
-        <blockTable colWidths="17cm" style="realplain">
-
-            {% for con in contacts %}
+        <blockTable colWidths="19cm" style="plain1">
+            <tr>
+                <td>
+                    <para style="colHeader">Contacts</para>
+                </td>
+        </tr>
+          {% for con in contacts %}
             <tr> <td>
                 {% if ':' in con %}
                 <para style="colHeader2">{{ con }}</para>
@@ -150,9 +167,18 @@
         </blockTable>
 
         <spacer length="25"/>
+        <blockTable colWidths="19cm" style="plain2">
+            <tr>
+                <td>
+                    <para style="colHeader">General Notes</para>
+                </td>
+        </tr>
+            {% for con in generalnotes %}
+            <tr> <td><para style="small-text">{{ con }}</para></td></tr>
+            {% endfor %}
+        </blockTable>
 
-        <para style="panel">{{ generalnotes|safe }}</para>
-        <spacer length="25"/>
+        <spacer length="5"/>
 
         {% if frognotes_table %}
         <blockTable colWidths="5cm,11.2cm,3cm" style="plain">

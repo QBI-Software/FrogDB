@@ -107,7 +107,7 @@
 
      <spacer length="25"/>
      <para style="heading">Disposal Details</para>
-     <blockTable colWidths="5cm,8cm,4cm" style="plain">
+     <blockTable colWidths="5cm,10cm,4cm" style="plain">
      <tr>
      <td><para style="colHeader">Death:</para></td>
      {% if frog.death.alive %}
