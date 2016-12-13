@@ -17,7 +17,7 @@
                     <title>{{ species }}</title>
 
                 </place>
-                <place x="300" y="0" width="200" height="1cm" origin="page" >
+                <place x="300" y="0" width="300" height="1cm" origin="page" >
                 <para style="footer">{{hostname}}: Printed on {{printdatetime}}</para>
             </place>
             </pageGraphics>
@@ -124,7 +124,7 @@
             {% endfor %}
         </blockTable>
         <spacer length="25"/>
-       
+
          <blockTable colWidths="2.5cm,3cm,3cm,3cm,2.5cm,2.5cm,2.5cm" style="plaintotal">
             <tr>
                 <td>
