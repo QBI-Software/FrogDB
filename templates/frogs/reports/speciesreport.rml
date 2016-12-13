@@ -182,7 +182,7 @@
         <spacer length="5"/>
 
         {% if frognotes_table %}
-        <blockTable colWidths="5cm,12cm,2cm" style="plain">
+        <blockTable colWidths="3cm,14cm,2cm" style="plain" repeatRows="1">
             <tr>
                 <td>
                     <para style="colHeader">Date</para>
