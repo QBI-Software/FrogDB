@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
 <!DOCTYPE document SYSTEM "rml.dtd">
 <document filename="QBIXenopusRegister.pdf">
-    <template pageSize="(21cm, 29.7cm)">
+    <template title="{{species}} Register" author="QBI" allowSplitting="20" pageSize="(21cm, 29.7cm)">
         <pageTemplate id="main" showBoundary="1">
             <pageGraphics>
                 <setFont name="Helvetica" size="8"/>
@@ -40,6 +40,8 @@
         <paraStyle name="colHeader2" fontName="Helvetica-Bold" fontSize="9" leading="10" spaceAfter="12"/>
         <paraStyle name="heading" fontName="Helvetica-Bold" fontSize="14" leading="36"
                 textColor="#5d6e89" spaceBefore="10" leftIndent="10"/>
+        <paraStyle name="panel-heading" fontName="Helvetica-Bold" fontSize="14" leading="36"
+                textColor="#5d6e89" spaceBefore="10" leftIndent="10"/>
         <paraStyle name="footer" fontName="Helvetica-Bold" fontSize="8" leading="10"/>
         <paraStyle name="panel" spaceBefore="10" leftIndent="10" leading="10" spaceAfter="12"
             fontName="Helvetica"
@@ -47,8 +49,9 @@
             borderWidth="1"
             borderColor="#d6e9c6"
             borderRadius="5"
-            borderPadding="3"
-            />
+            borderPadding="3">
+            <lineStyle kind="OUTLINE" colorName="#e3e3e3"/>
+            </paraStyle>
         <blockTableStyle id="realplain">
             <blockFont name="Helvetica" size="8"/>
             <blockBottomPadding length="2"/>
@@ -90,7 +93,6 @@
 
 
         <spacer length="6"/>
-
         <blockTable colWidths="17cm" style="realplain">
 
             {% for con in contacts %}
@@ -132,7 +134,7 @@
 
             {% for permit in permits %}
             <tr>
-                <td vAlign="top">{{permit.aqis}}</td>
+                <td vAlign="top" background="{{permit.color}}">{{permit.aqis}}</td>
                 <td vAlign="top">{{permit.qen}}</td>
                 <td vAlign="top">{{permit.arrival_date|date:"d-M-Y"}}</td>
                 <td vAlign="top">{{permit.get_totalfrogs|force_escape}}</td>
@@ -148,8 +150,10 @@
         </blockTable>
 
         <spacer length="25"/>
+
         <para style="panel">{{ generalnotes|safe }}</para>
         <spacer length="25"/>
+
         {% if frognotes_table %}
         <blockTable colWidths="5cm,11.2cm,3cm" style="plain">
             <tr>
@@ -176,7 +180,9 @@
         {% endif %}
 
         <spacer length="25"/>
-        <blockTable colWidths="2.2cm,2cm,3cm,2cm,2cm,4cm,4cm" style="plain">
+        {% for loc in locations %}
+        <para style="panel-heading">{{ loc.name|force_escape }}</para>
+        <blockTable colWidths="2.2cm,2cm,3cm,2cm,2cm,4cm,4cm" style="plain" repeatRows="1">
             <tr>
 
                 <td>
@@ -207,7 +213,8 @@
             </tr>
 
             {% for frog in frogs_table %}
-            {% if frog.species.name == species %}
+
+            {% if frog.species.name == species and frog.current_location == loc %}
             <tr background="{{frog.qen.color}}">
                 <td>{{frog.frogid}}</td>
                 <td>{{frog.qen.supplier.name}}</td>
@@ -259,6 +266,6 @@
 
 
         </blockTable>
-
+{% endfor %}
     </story>
 </document>

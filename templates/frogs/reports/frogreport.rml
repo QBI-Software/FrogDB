@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
 <!DOCTYPE document SYSTEM "rml.dtd">
 <document filename="FrogReport.pdf">
- <template pageSize="(21cm, 29.7cm)">
+ <template title="{{frog.frogid}} Frog Report" pageSize="(21cm, 29.7cm)">
      <pageTemplate id="main" showBoundary="1">
 		<pageGraphics>
 		    <setFont name="Helvetica-Bold" size="18"/>

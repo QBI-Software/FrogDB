@@ -628,7 +628,7 @@ def rml_html_clean(para):
     from bs4 import BeautifulSoup
 
     soup = BeautifulSoup(para, 'html.parser')
-    print("text:", soup.get_text())
+    #print("text:", soup.get_text())
     parts = [text.replace('\xa0', '') for text in soup.stripped_strings]
     p = []
     t0 =0

@@ -70,23 +70,23 @@
             <h4>Choose an action</h4>
             <div class="ui-responsive btn-group-vertical">
                 {% if perms.frogs.add_frogattachment %}
-                <a class="btn btn-default" href="{% url 'frogs:frog_upload' frog.id %}">Images</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_upload' frog.id %}" title="Add or edit Images"><span class="glyphicon glyphicon-picture"></span> Images</a>
                 {% endif %}
                 {% if perms.frogs.change_frog %}
-                <a class="btn btn-default" href="{% url 'frogs:frog_update' frog.id %}">Edit</a>
-                <a class="btn btn-default" href="{% url 'frogs:frog_death' frog.id %}">Death</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_update' frog.id %}" title="Edit frog data"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_death' frog.id %}" title="Edit death details"><span class="glyphicon glyphicon-fire"></span> Death</a>
                     {% if frog.death.name != 'Alive' %}
-                    <a class="btn btn-default" href="{% url 'frogs:frog_disposal' frog.id %}">Disposal</a>
+                    <a class="btn btn-default" href="{% url 'frogs:frog_disposal' frog.id %}" title="Edit disposal details"><span class="glyphicon glyphicon-trash"></span> Disposal</a>
                     {% endif %}
                 {% endif %}
                 {% if perms.frogs.add_operation and frog.gender == 'female' and frog.death.name == 'Alive' and frog.operation_set.count < site_config.max_ops %}
-                <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}">Add Operation</a>
+                <a class="btn btn-default" href="{% url 'frogs:operation_create' frog.id %}" title="Add Operation details"><span class="glyphicon glyphicon-plus-sign"></span> Add Operation</a>
                 {% endif %}
-                <a class="btn btn-default" href="{% url 'frogs:frog_report' frog.id %}">PDF</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_report' frog.id %}" title="Download PDF"><span class="glyphicon glyphicon-download-alt"></span> Download PDF</a>
                 {% if perms.frogs.delete_frog %}
-                <a class="btn btn-default" href="{% url 'frogs:frog_delete' frog.id %}">Delete</a>
+                <a class="btn btn-default" href="{% url 'frogs:frog_delete' frog.id %}" title="Delete this frog record"><span class="glyphicon glyphicon-remove-sign"></span> Delete</a>
                 {% endif %}
-                <a class="btn btn-default" onclick="javascript:history.back();return false;">Return </a>
+                <a class="btn btn-default" onclick="javascript:history.back();return false;" title="Back"><span class="glyphicon glyphicon-circle-arrow-left"></span> Return </a>
             </div>
         </div>
 
