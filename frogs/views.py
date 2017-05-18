@@ -108,23 +108,21 @@ class LoginView(FormView):
     def form_valid(self, form):
         user = form.get_user()
 
-        trialUser = User.objects.get(username = user)
-        if trialUser.last_login == None:
-            self.newUser = True
-            msg = '% is first time login - redirecting to change password' % user
-            logger.info(msg)
-
         if user is not None:
             msg = 'User: %s' % user
+
             if user.is_active:
+                if user.last_login == None:
+                    self.newUser = True
+                    msg = '%s : first time login - redirecting to change password - ' % msg
                 login(self.request, user)
-                msg = '% has logged in' % msg
+                msg = '%s has logged in' % msg
                 logger.info(msg)
 
             else:
                 # Return a 'disabled account' error message
                 form.add_error = 'Your account has been disabled. Please contact admin.'
-                msg = '% has disabled account' % msg
+                msg = '%s has disabled account' % msg
                 logger.warning(msg)
 
         else:
@@ -157,9 +155,8 @@ class LoginView(FormView):
 
     def get_success_url(self):
         if self.newUser:
-            return "/password_change"
-
-        if self.success_url:
+            redirect_to = "/password_change"
+        elif self.success_url:
             redirect_to = self.success_url
         else:
             redirect_to = self.request.POST.get(
