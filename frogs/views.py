@@ -19,6 +19,7 @@ from django.views.generic import FormView, RedirectView
 from django_tables2 import RequestConfig
 from django.db.models import Sum
 from ipware.ip import get_ip
+from django.contrib.auth.models import User
 
 try:
     from StringIO import StringIO
@@ -93,6 +94,7 @@ class LoginView(FormView):
     success_url = '/frogs'
     form_class = AuthenticationForm
     redirect_field_name = REDIRECT_FIELD_NAME
+    newUser = False;
 
     @method_decorator(sensitive_post_parameters('password'))
     @method_decorator(csrf_protect)
@@ -105,12 +107,19 @@ class LoginView(FormView):
 
     def form_valid(self, form):
         user = form.get_user()
+
+        trialUser = User.objects.get(username = user)
+        if trialUser.last_login == None:
+            self.newUser = True
+            print(self.newUser)
+
         if user is not None:
             msg = 'User: %s' % user
             if user.is_active:
                 login(self.request, user)
                 msg = '% has logged in' % msg
                 logger.info(msg)
+
             else:
                 # Return a 'disabled account' error message
                 form.add_error = 'Your account has been disabled. Please contact admin.'
@@ -146,6 +155,9 @@ class LoginView(FormView):
         return False
 
     def get_success_url(self):
+        if self.newUser:
+            return "/password_change"
+
         if self.success_url:
             redirect_to = self.success_url
         else:
@@ -161,7 +173,6 @@ class LoginView(FormView):
             redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
         return redirect_to
         #return reverse(redirect_to)
-
 
 class LogoutView(RedirectView):
     """
@@ -188,7 +199,7 @@ def locked_out(request):
     else:
         form = AxesCaptchaForm()
 
-    return render_to_response('frogs/locked.html', dict(form=form), context_instance=RequestContext(request))
+    return render(request, 'frogs/locked.html', context = dict(form=form))
 
 def change_password(request):
     template_response = views.password_change(request)
