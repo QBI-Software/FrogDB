@@ -111,7 +111,8 @@ class LoginView(FormView):
         trialUser = User.objects.get(username = user)
         if trialUser.last_login == None:
             self.newUser = True
-            print(self.newUser)
+            msg = '% is first time login - redirecting to change password' % user
+            logger.info(msg)
 
         if user is not None:
             msg = 'User: %s' % user
