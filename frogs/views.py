@@ -1274,7 +1274,7 @@ class DocumentList(LoginRequiredMixin, generic.ListView):
     raise_exception = True
 
     def get_queryset(self):
-        return Document.objects.order_by('order')
+        return Document.objects.order_by('order','description')
 
     def get_context_data(self, **kwargs):
         spp = self.kwargs.get('sp')
