@@ -1271,13 +1271,32 @@ class NotesDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteVie
 # DOCUMENTS
 class DocumentList(LoginRequiredMixin, generic.ListView):
     template_name = 'frogs/document/document_list.html'
-    context_object_name = 'docs_list'
     raise_exception = True
 
     def get_queryset(self):
-        table = DocumentTable(Document.objects.order_by('pk'))
-        RequestConfig(self.request, paginate={"per_page": 10}).configure(table)
-        return table
+        return Document.objects.order_by('order')
+
+    def get_context_data(self, **kwargs):
+        spp = self.kwargs.get('sp')
+        if (spp is None):
+            spp = 'all'
+
+        context = super(DocumentList, self).get_context_data(**kwargs)
+        spnames={'new':'New','old':'Old','all':'All'}
+        #ALL
+        qs = self.get_queryset()
+        if (spp == 'new'):
+            qs = qs.filter(archive=False)
+        elif (spp == 'old'):
+            qs = qs.filter(archive=True)
+
+        table = DocumentTable(qs)
+        RequestConfig(self.request, paginate={"per_page": 20}).configure(table)
+
+        context['species'] = spp
+        context['docs_list'] = table
+        context['splist'] = spnames.items()
+        return context
 
 class DocumentDetail(LoginRequiredMixin, generic.DetailView):
     model = Document

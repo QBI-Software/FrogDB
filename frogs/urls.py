@@ -131,6 +131,8 @@ urlpatterns = [
         views.DocumentUpdate.as_view(), name="documents_update"),
     url(r'^documents/(?P<pk>\d+)/delete/$',
         views.DocumentDelete.as_view(), name="documents_delete"),
+    url(r'^documents/list/(?P<sp>\w+)$',
+        views.DocumentList.as_view(), name='documents_list'),
     url(r'^documents/list/$',
         views.DocumentList.as_view(), name='documents_list'),
     url(r'^reports/froglog/(?P<species>[a-zA-Z\.]*)/$',

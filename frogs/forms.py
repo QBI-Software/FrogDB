@@ -265,9 +265,7 @@ class DocumentForm(ModelForm):
 
     class Meta:
         model = Document
-        fields = ('docfile',
-                  'description'
-                  )
+        fields = ('docfile', 'description','order','archive')
         widgets = {
             'docfile': forms.FileInput()
         }

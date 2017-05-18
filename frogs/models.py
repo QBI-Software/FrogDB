@@ -494,6 +494,8 @@ class Notes(models.Model):
 class Document(models.Model):
     docfile = models.FileField(verbose_name="Document")
     description = models.CharField(_("Description"), max_length=200, null=True, blank=True)
+    order = models.SmallIntegerField(verbose_name="Order", null=False, default=1)
+    archive = models.BooleanField(verbose_name="Archive", null=False, default=False)
 
     def __str__(self):
         #return os.path.basename(self.docfile.name)
@@ -501,7 +503,7 @@ class Document(models.Model):
 
     def getextension(self):
         ext = os.path.splitext(self.docfile.name)[1]  # [0] returns path+filename
-        print("DEBUG:ext=", ext)
+        #print("DEBUG:ext=", ext)
         return ext
 
     def clean(self):

@@ -225,5 +225,6 @@ class DocumentTable(tables.Table):
     class Meta:
         model = Document
         attrs = {"class": "ui-responsive table table-hover"}
-        fields = ['docfile','description','created','size','id']
+        fields = ['order','docfile','description','created','size','archive','id']
         sortable = True
+        order_by_field = 'order'

@@ -6,8 +6,27 @@
     {% if perms.frogs.add_document %}
     <p><a href="{% url 'frogs:documents_create' %}" class="btn btn-info">Create New Document</a></p>
     {% endif %}
-    {% if docs_list %}
-    {% render_table docs_list %}
-    {% endif %}
+
+    <ul class="nav nav-tabs">
+         {% for sp,value in splist %}
+             {% if sp == species %}
+             <li class="active">
+             {% else %}
+            <li>
+             {% endif %}
+             <a  href="{% url 'frogs:documents_list' sp %}">{{value}}</a></li>
+        {% endfor %}
+
+    </ul>
+    <div class="tab-content">
+    <div id="{{species}}" class="tab-pane fade in active">
+        {% if docs_list %}
+            {% render_table docs_list %}
+        {% else %}
+            <div class="alert alert-warning"><p>No documents in database</p></div>
+        {% endif %}
+    </div>
+    </div>
+
 </div>
 {% endblock %}
